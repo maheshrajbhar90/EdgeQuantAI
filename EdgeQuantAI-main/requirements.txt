@@ -1,15 +1,7 @@
+streamlit
 pandas
 yfinance
-TA-Lib
-textwrap
 openai
-streamlit
-re
-json
-
-streamlit
 huggingface_hub
-pandas_ta
-
-
-
+--extra-index-url https://pypi.debian.net/
+TA-Lib
