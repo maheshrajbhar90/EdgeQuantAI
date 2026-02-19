@@ -1,11 +1,15 @@
 pandas
 yfinance
 TA-Lib
-gspread
 textwrap
 openai
 streamlit
 re
 json
+
+streamlit
+huggingface_hub
+pandas_ta
+
 
 
