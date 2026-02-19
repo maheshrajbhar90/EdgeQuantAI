@@ -1,0 +1,11 @@
+# Sensitive config files
+config.json
+.env
+.streamlit/secrets.toml
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Local data (if you don't want to upload huge CSVs)
+assets/nse_symbols.csv
