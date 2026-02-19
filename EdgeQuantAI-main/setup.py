@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='stock_analyzer',
+    name='EdgeQuantAI',
     version='0.0.0.1',
     author='Mahesh Kumar',
     author_email='maheshrajbhar90@gmail.com',
@@ -27,6 +27,7 @@ setup(
     ],
     python_requires='>=3.8',
 )
+
 
 
 
