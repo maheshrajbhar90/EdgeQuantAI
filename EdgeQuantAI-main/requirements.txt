@@ -5,4 +5,4 @@ openai
 huggingface_hub
 --extra-index-url https://pypi.debian.net/
 TA-Lib
-git+https://github.com/maheshrajbhar90/stock_analyzer.git
+
