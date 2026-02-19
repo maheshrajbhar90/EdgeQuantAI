@@ -4,7 +4,7 @@ import re
 import pandas as pd
 import streamlit as st
 # from openai import OpenAI
-from EdgeQuantAI.stock_analyzer import StockTechnicalAnalyzer
+from EdgeQuantAI import StockTechnicalAnalyzer
 
 from huggingface_hub import InferenceClient
 
@@ -170,6 +170,7 @@ if user_input:
     st.session_state.messages.append(
         {"role": "assistant", "content": assistant_response}
     )
+
 
 
 
