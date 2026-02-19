@@ -7,6 +7,8 @@ from openai import OpenAI
 from stock_analyzer import StockTechnicalAnalyzer
 from huggingface_hub import InferenceClient
 
+headers={"authorization":st.secrets['API_KEY'],
+        "content-type":"application/json"}
 
 
 # ===================== PAGE CONFIG =====================
@@ -18,8 +20,22 @@ st.set_page_config(
 
 # ===================== LOAD CONFIG =====================
 working_dir = os.path.dirname(os.path.abspath(__file__))
-config_data = json.load(open(f"{working_dir}/config.json"))
-API_KEY = config_data["Hugging_face"]
+config_data = json.load(open(f"{working_dir}/config.json"))\
+
+
+import streamlit as st
+
+# Check if we are on Streamlit Cloud (st.secrets) or Local (config.json)
+try:
+    if "API_KEY" in st.secrets:
+        API_KEY = st.secrets["API_KEY"]
+    else:
+        # This part runs if you are local and haven't set up st.secrets
+        config_data = json.load(open("config.json"))
+        API_KEY = config_data["API_KEY"]
+except Exception:
+    st.error("Credential Error: Please set your API Key in Streamlit Secrets or config.json")
+# API_KEY = config_data["Hugging_face"]
 
 # client = OpenAI(api_key=API_KEY)
 analyzer = StockTechnicalAnalyzer()
@@ -153,3 +169,4 @@ if user_input:
     st.session_state.messages.append(
         {"role": "assistant", "content": assistant_response}
     )
+
