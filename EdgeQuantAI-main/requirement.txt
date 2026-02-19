@@ -1,0 +1,11 @@
+pandas
+yfinance
+TA-Lib
+gspread
+textwrap
+openai
+streamlit
+re
+json
+
+
