@@ -1,41 +1,74 @@
-import os
-import json
 import re
 import pandas as pd
-import streamlit as st
+# import pandas_ta
+import yfinance
 # from openai import OpenAI
 from EdgeQuantAI import StockTechnicalAnalyzer
-
+# from fundamental_analyser import FundamentalAnalyser
 from huggingface_hub import InferenceClient
+from PIL import Image
+import json
+import streamlit as st
+import os
 
-headers={"authorization":st.secrets['API_KEY'],
-        "content-type":"application/json"}
+# import talib  # This must stay here since you want to use it
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(BASE_DIR, "assets", "logo.png")
 
 # ===================== PAGE CONFIG =====================
+try:
+    icon_image = Image.open(logo_path)
+except Exception:
+    # Fallback to a string emoji if the file is missing
+    icon_image = "📈" 
+
+# 3. Apply to Page Config
 st.set_page_config(
     page_title="EdgeQuantAI",
-    page_icon="assets/logo.png",
+    page_icon=icon_image,  # Use the object, not the path string
     layout="centered"
 )
-
 # ===================== LOAD CONFIG =====================
 working_dir = os.path.dirname(os.path.abspath(__file__))
 config_data = json.load(open(f"{working_dir}/config.json"))\
 
 
-import streamlit as st
 
 # Check if we are on Streamlit Cloud (st.secrets) or Local (config.json)
+
+# Get absolute path of current file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(BASE_DIR, "config.json")
+
+API_KEY = None
+
+# 1️⃣ Try Streamlit Secrets (Cloud)
 try:
-    if "API_KEY" in st.secrets:
-        API_KEY = st.secrets["API_KEY"]
-    else:
-        # This part runs if you are local and haven't set up st.secrets
-        config_data = json.load(open("config.json"))
-        API_KEY = config_data["API_KEY"]
+    API_KEY = st.secrets.get("API_KEY")
 except Exception:
-    st.error("Credential Error: Please set your API Key in Streamlit Secrets or config.json")
+    API_KEY = None
+
+# 2️⃣ Fallback to local config.json (Codespaces / local dev)
+if not API_KEY and os.path.exists(config_path):
+    try:
+        with open(config_path) as f:
+            config_data = json.load(f)
+            API_KEY = config_data.get("API_KEY")
+    except Exception:
+        pass
+
+# 3️⃣ Final validation
+if not API_KEY:
+    st.error("API Key not found. Set it in Streamlit Secrets or config.json")
+    st.stop()
+
+# 4️⃣ Correct header format for Hugging Face router
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
 # API_KEY = config_data["Hugging_face"]
 
 # client = OpenAI(api_key=API_KEY)
@@ -44,7 +77,7 @@ client = InferenceClient(api_key=API_KEY)
 
 
 # ===================== HEADER =====================
-st.image("assets/logo.png", width=100)
+st.image(icon_image, width=100)
 
 st.markdown(
     "<h1 style='text-align:center;'>EdgeQuantAI</h1>",
