@@ -8,3 +8,5 @@ pandas-ta
 Pillow
 --extra-index-url https://pypi.debian.net/
 TA-Lib
+huggingface-hub[inference]>=0.20.0
+
