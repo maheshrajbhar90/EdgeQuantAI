@@ -1,8 +1,10 @@
-streamlit
-pandas
-yfinance
+streamlit==1.54.0
+pandas==2.2.2
+numpy==1.26.4
+yfinance==0.2.40
 openai
 huggingface_hub
---extra-index-url https://pypi.debian.net/
+tabulate
+pandas-ta
+Pillow
 TA-Lib
-
