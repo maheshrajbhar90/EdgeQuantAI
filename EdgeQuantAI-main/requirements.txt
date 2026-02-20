@@ -4,9 +4,9 @@ numpy>=2.2.6
 yfinance==0.2.40
 openai
 tabulate
-pandas-ta
 Pillow
 --extra-index-url https://pypi.debian.net/
 TA-Lib
 huggingface-hub[inference]>=0.20.0
+
 
