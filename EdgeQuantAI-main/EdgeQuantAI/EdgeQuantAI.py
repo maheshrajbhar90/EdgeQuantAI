@@ -1,12 +1,13 @@
 
+# import pandas_ta as ta
+import textwrap
+import sys
+import os
 import pandas as pd
 import yfinance as yf
 import talib
 import warnings
 warnings.filterwarnings("ignore")
-import os
-import sys
-import textwrap
 
 # Ensure the directory of the current script is in the path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -17,10 +18,7 @@ if current_dir not in sys.path:
 try:
     from fundamental_analyzer import FundamentalAnalyser
 except ImportError:
-    from fundamental_analyser import FundamentalAnalyser
-
-
-
+    from EdgeQuantAI.fundamental_analyzer import FundamentalAnalyser
 
 class StockTechnicalAnalyzer:
 
@@ -90,6 +88,7 @@ class StockTechnicalAnalyzer:
 
     # Bollinger Bands direction
     def bb_direction(self,row):
+        
         if pd.isna(row['bb_upper']) or pd.isna(row['bb_middle']) or pd.isna(row['bb_lower']):
             return 'Neutral'
         if row['Close'] > row['bb_middle']:
@@ -103,17 +102,18 @@ class StockTechnicalAnalyzer:
 
 
     def z_score(self,df,window=20):
+        
 
-      """
-      Calculate rolling volume Z-score.
-      df must contain a 'Volume' column.
-      window = rolling period for mean & std.
-      """
-      df=df.copy()
-      df['vol_mean']=df['Volume'].rolling(window).mean()
-      df['vol_std']=df['Volume'].rolling(window).std()
-      df['vol_zscore']=(df['Volume']-df['vol_mean'])/df['vol_std']
-      return df
+        """
+        Calculate rolling volume Z-score.
+        df must contain a 'Volume' column.
+        window = rolling period for mean & std.
+        """
+        df=df.copy()
+        df['vol_mean']=df['Volume'].rolling(window).mean()
+        df['vol_std']=df['Volume'].rolling(window).std()
+        df['vol_zscore']=(df['Volume']-df['vol_mean'])/df['vol_std']
+        return df
 
 
     # Stochastic direction
@@ -354,79 +354,197 @@ class StockTechnicalAnalyzer:
         return ohlc_df
 
 
-    def get_latest_candlestick_patterns(self,symbols,periods=None,interval=None):
-        periods = periods or self.period
-        intervals = interval or self.interval
-        result_df = []
-        pattern_df=[]
+    # def get_latest_candlestick_patterns(self,symbols,periods=None,interval=None):
+    #     periods = periods or self.period
+    #     intervals = interval or self.interval
+    #     result_df = []
+    #     pattern_df=[]
 
-        try:
+    #     try:
+
+    #         for tick in symbols:
+    #             ohlc_df = yf.download(tick + self.exchange_suffix,period=periods, interval=intervals, auto_adjust=True)
+    #             ohlc_df=ohlc_df.droplevel(level=1,axis=1).reset_index()
+    #             if 'Datetime' in ohlc_df.columns:
+    #                 ohlc_df = ohlc_df.rename(columns={'Datetime': 'Date'})
+    #                 ohlc_df.set_index("Date",inplace=True)                    
+    #                 ohlc_df["Date"] = (pd.to_datetime(ohlc_df["Date"], utc=True).dt.tz_convert("Asia/Kolkata").dt.tz_localize(None))
+
+    #             ohlc_df['Ticker']=tick # Now ohlc_df has 'Ticker' column, Date as index
+    #             print(f"Success for {tick}")
+
+    #             # Identify candlestick patterns
+    #             # Pass a copy to identify_candlestick_patterns to avoid modifying the ohlc_df that analyze_stock uses (which expects index)
+    #             df_with_indicators = self.add_indicators(ohlc_df)
+    #             if df_with_indicators is None:
+    #                 continue   # skip this ticker cleanly
+    #             res_analysis = self.generate_signal(df_with_indicators)
+    #             result_for_patterns = self.identify_candlestick_patterns(df_with_indicators.copy())
+    #             latest_candle_patterns = result_for_patterns.iloc[-1:].reset_index()
+    #             # latest_candle_patterns = latest_candle_patterns.reset_index() # Convert Date index to Date column
+
+    #             # res_analysis = self.analyze_stock(ohlc_df) # Pass original ohlc_df with Date index
+
+    #             # print(res_analysis)
+
+    #             if res_analysis:
+    #                 pattern_df.append(res_analysis)
+    #                 # pattern_df.append(res_analysis) # res_analysis contains 'Date' as a key, 'Ticker' as a key
+
+    #             # Append the processed latest_candle_patterns
+    #             result_df.append(latest_candle_patterns)
+
+    #     except Exception as e:
+    #             print(f"An error occurred: {e}")
+
+
+
+    #     # Combine results into a single DataFrame
+    #     final_result_df = pd.concat(result_df, ignore_index=True)
+    #     final_pattern_df = pd.DataFrame(pattern_df)
+
+    #     if final_result_df.empty or final_pattern_df.empty:
+    #         print("No data to merge. This could be due to errors in analyze_stock or no patterns found.")
+    #         return None
+
+    #     # Ensure Date formats match - this should now work
+    #     final_pattern_df["Date"] = pd.to_datetime(final_pattern_df["Date"])
+    #     final_result_df["Date"] = pd.to_datetime(final_result_df["Date"])
+
+    #     # # ---------------- Correct Merge ----------------
+    #     combined_df = pd.merge(final_pattern_df,final_result_df[["Date", "Pattern", "Code", "Ticker"]],
+    #         on=["Date", "Ticker"], how="left")
+    #     return combined_df
+    
+    def get_latest_candlestick_patterns(self, symbols, periods=None, interval=None):
+        
+            periods = periods or self.period
+            intervals = interval or self.interval
+
+            result_df = []
+            pattern_df = []
 
             for tick in symbols:
-                ohlc_df = yf.download(tick + self.exchange_suffix,period=periods, interval=intervals, auto_adjust=True)
-                # ohlc_df now has DatetimeIndex
-                ohlc_df=ohlc_df.droplevel(level=1,axis=1)
-                # ohlc_df=ohlc_df.iloc[:-1] ## removes the last row (today’s candle)
 
-                if isinstance(ohlc_df.index, pd.DatetimeIndex) or'Datetime' in ohlc_df.columns:
-                    ohlc_df=ohlc_df.reset_index()
-                if 'Datetime' in ohlc_df.columns:
-                    ohlc_df = ohlc_df.rename(columns={'Datetime': 'Date'})
-                elif 'index' in ohlc_df.columns:
-                    ohlc_df = ohlc_df.rename(columns={'index': 'Date'})
+                try:
+                    # ---------------- 1️⃣ Download ----------------
+                    ohlc_df = yf.download(
+                        tick + self.exchange_suffix,
+                        period=periods,
+                        interval=intervals,
+                        auto_adjust=True,
+                        progress=False
+                    )
 
-                ohlc_df = ohlc_df.rename(columns={'Datetime': 'Date'})
-                ohlc_df["Date"] = (pd.to_datetime(ohlc_df["Date"], utc=True).dt.tz_convert("Asia/Kolkata").dt.tz_localize(None))
-                ohlc_df=ohlc_df.set_index("Date")
+                    if ohlc_df is None or ohlc_df.empty:
+                        print(f"[SKIP] No data for {tick}")
+                        continue
 
+                    # ---------------- 2️⃣ Handle MultiIndex ----------------
+                    if isinstance(ohlc_df.columns, pd.MultiIndex):
+                        ohlc_df.columns = ohlc_df.columns.get_level_values(0)
 
-                ohlc_df['Ticker']=tick # Now ohlc_df has 'Ticker' column, Date as index
-                print(f"Success for {tick}")
+                    # ---------------- 3️⃣ Reset Index ----------------
+                    ohlc_df = ohlc_df.reset_index()
 
-                # Identify candlestick patterns
-                # Pass a copy to identify_candlestick_patterns to avoid modifying the ohlc_df that analyze_stock uses (which expects index)
-                df_with_indicators = self.add_indicators(ohlc_df)
-                if df_with_indicators is None:
-                    continue   # skip this ticker cleanly
-                res_analysis = self.generate_signal(df_with_indicators)
-                # result_for_patterns = self.identify_candlestick_patterns(ohlc_df.copy())
-                # latest_candle_patterns = result_for_patterns.iloc[-1:, :].copy()
-                result_for_patterns = self.identify_candlestick_patterns(df_with_indicators.copy())
-                latest_candle_patterns = result_for_patterns.iloc[-1:].reset_index()
-                # latest_candle_patterns = latest_candle_patterns.reset_index() # Convert Date index to Date column
+                    # ---------------- 4️⃣ Detect Date Column Safely ----------------
+                    date_col = None
+                    for col in ohlc_df.columns:
+                        if col.lower() in ["date", "datetime"]:
+                            date_col = col
+                            break
 
-                # res_analysis = self.analyze_stock(ohlc_df) # Pass original ohlc_df with Date index
+                    if date_col is None:
+                        print(f"[ERROR] Date column missing for {tick}")
+                        continue
 
-                # print(res_analysis)
+                    ohlc_df.rename(columns={date_col: "Date"}, inplace=True)
 
-                if res_analysis:
-                    pattern_df.append(res_analysis)
-                    # pattern_df.append(res_analysis) # res_analysis contains 'Date' as a key, 'Ticker' as a key
+                    # ---------------- 5️⃣ Convert Timezone Safely ----------------
+                    ohlc_df["Date"] = (
+                        pd.to_datetime(ohlc_df["Date"], errors="coerce", utc=True)
+                        .dt.tz_convert("Asia/Kolkata")
+                        .dt.tz_localize(None)
+                    )
 
-                # Append the processed latest_candle_patterns
-                result_df.append(latest_candle_patterns)
+                    if ohlc_df["Date"].isna().all():
+                        print(f"[ERROR] Date conversion failed for {tick}")
+                        continue
 
-        except Exception as e:
-                print(f"An error occurred: {e}")
+                    ohlc_df.set_index("Date", inplace=True)
 
+                    # ---------------- 6️⃣ Required Columns Check ----------------
+                    required_cols = ["Open", "High", "Low", "Close", "Volume"]
+                    if not all(col in ohlc_df.columns for col in required_cols):
+                        print(f"[ERROR] Missing OHLC columns for {tick}")
+                        continue
 
+                    ohlc_df["Ticker"] = tick
 
-        # Combine results into a single DataFrame
-        final_result_df = pd.concat(result_df, ignore_index=True)
-        final_pattern_df = pd.DataFrame(pattern_df)
+                    # ---------------- 7️⃣ Add Indicators ----------------
+                    df_with_indicators = self.add_indicators(ohlc_df)
 
-        if final_result_df.empty or final_pattern_df.empty:
-            print("No data to merge. This could be due to errors in analyze_stock or no patterns found.")
-            return None
+                    if df_with_indicators is None or df_with_indicators.empty:
+                        print(f"[SKIP] Indicators failed for {tick}")
+                        continue
 
-        # Ensure Date formats match - this should now work
-        final_pattern_df["Date"] = pd.to_datetime(final_pattern_df["Date"])
-        final_result_df["Date"] = pd.to_datetime(final_result_df["Date"])
+                    # ---------------- 8️⃣ Generate Signal ----------------
+                    res_analysis = self.generate_signal(df_with_indicators)
 
-        # # ---------------- Correct Merge ----------------
-        combined_df = pd.merge(final_pattern_df,final_result_df[["Date", "Pattern", "Code", "Ticker"]],
-            on=["Date", "Ticker"], how="left")
-        return combined_df
+                    # ---------------- 9️⃣ Pattern Detection ----------------
+                    result_for_patterns = self.identify_candlestick_patterns(
+                        df_with_indicators.copy()
+                    )
+
+                    if result_for_patterns is None or result_for_patterns.empty:
+                        print(f"[SKIP] Pattern detection failed for {tick}")
+                        continue
+
+                    latest_candle_patterns = result_for_patterns.iloc[-1:].reset_index()
+
+                    if latest_candle_patterns.empty:
+                        continue
+
+                    # ---------------- 🔟 Append Results ----------------
+                    result_df.append(latest_candle_patterns)
+
+                    if res_analysis:
+                        pattern_df.append(res_analysis)
+
+                except Exception as e:
+                    print(f"[ERROR] {tick}: {e}")
+                    continue
+
+            # ---------------- FINAL SAFETY CHECKS ----------------
+            if not result_df:
+                print("[FINAL] No valid result data.")
+                return None
+
+            final_result_df = pd.concat(result_df, ignore_index=True)
+
+            if not pattern_df:
+                print("[INFO] No signal data found. Returning pattern data only.")
+                return final_result_df
+
+            final_pattern_df = pd.DataFrame(pattern_df)
+
+            if "Date" not in final_pattern_df.columns:
+                print("[ERROR] Signal data missing Date column.")
+                return final_result_df
+
+            # Normalize date formats
+            final_pattern_df["Date"] = pd.to_datetime(final_pattern_df["Date"])
+            final_result_df["Date"] = pd.to_datetime(final_result_df["Date"])
+
+            # Safe merge
+            combined_df = pd.merge(
+                final_pattern_df,
+                final_result_df[["Date", "Pattern", "Code", "Ticker"]],
+                on=["Date", "Ticker"],
+                how="left"
+            )
+
+            return combined_df
 
     def main(self,ticker:list):
 
@@ -439,7 +557,6 @@ class StockTechnicalAnalyzer:
 
         ##################################***Main_File***###############################################
 
-        # combined_tickers=list(dict.fromkeys(nifty_50+nifty_100+mid_cap100))
 
         # Get latest candlestick patterns for Nifty 50 symbols
         final_result = self.get_latest_candlestick_patterns(ticker)
@@ -668,17 +785,3 @@ class StockTechnicalAnalyzer:
         tech_prompt=self.generate_technical_prompt(ticker, tech_data)
 
         return tech_prompt
-
-
-
-
-
-
-
-
-
-
-
-
-
-
