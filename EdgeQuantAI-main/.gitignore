@@ -1,11 +1,41 @@
-# Sensitive config files
+# --- Secrets / local config -------------------------------------------------
+# Never commit keys. Copy config.example.json to config.json for local use, or
+# use Streamlit secrets / environment variables (see README).
 config.json
+!config.example.json
 .env
-.streamlit/secrets.toml
+.env.*
+**/.streamlit/secrets.toml
 
-# Python cache files
-__pycache__/
-*.pyc
-
-# Local data (if you don't want to upload huge CSVs)
+# --- Local data (if you don't want to upload huge CSVs) ---------------------
+# NB: assets/nse_symbols.csv is tracked and required by the app, so this entry
+# has no effect (KNOWN_ISSUES G4).
 assets/nse_symbols.csv
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# --- Virtual environments ---------------------------------------------------
+.venv/
+venv/
+env/
+
+# --- Tooling caches & reports -----------------------------------------------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# --- Editors / OS -----------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+.ipynb_checkpoints/

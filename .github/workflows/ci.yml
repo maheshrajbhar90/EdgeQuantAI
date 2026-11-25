@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TA_LIB_VERSION: "0.8.3"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+defaults:
+  run:
+    # The Python project lives in a sub-directory of the repository.
+    working-directory: EdgeQuantAI-main
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install "ruff>=0.15,<0.18"
+      - name: ruff check
+        run: ruff check --output-format=github .
+      - name: ruff format --check
+        run: ruff format --check .
+
+  test:
+    name: Test & type-check (Python ${{ matrix.python-version }}${{ matrix.pandas && format(', pandas {0}', matrix.pandas) || '' }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        # "" = whatever pip resolves. Declared as a matrix key so the include
+        # below adds a *separate* job instead of merging into the 3.11 one.
+        pandas: [""]
+        include:
+          # Python 3.11 normally resolves to pandas 3. Also run it on pandas 2.3
+          # so the exact-dtype differential test covers the pandas-2 stack on a
+          # modern Python (the lenient golden serializer is never the only check).
+          - python-version: "3.11"
+            pandas: "2.3"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: EdgeQuantAI-main/pyproject.toml
+
+      # TA-Lib wheels on PyPI bundle the C library, but install it anyway so a
+      # source build (no wheel for this platform/Python) also succeeds.
+      # TA_LIB_VERSION is an upstream release tag (github.com/ta-lib/ta-lib) and
+      # must stay compatible with the TA-Lib wrapper range in pyproject.toml.
+      # The release ships a prebuilt .deb, so the download is what gets cached.
+      - name: Cache TA-Lib C library package
+        id: ta-lib-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ta-lib
+          key: ta-lib-deb-${{ env.TA_LIB_VERSION }}-amd64
+
+      - name: Download TA-Lib C library
+        if: steps.ta-lib-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.cache/ta-lib
+          curl -fsSL -o ~/.cache/ta-lib/ta-lib.deb \
+            "https://github.com/ta-lib/ta-lib/releases/download/v${TA_LIB_VERSION}/ta-lib_${TA_LIB_VERSION}_amd64.deb"
+
+      - name: Install TA-Lib C library
+        run: sudo dpkg -i ~/.cache/ta-lib/ta-lib.deb
+
+      - name: Install package with dev extras
+        run: pip install -e ".[dev]"
+
+      - name: Pin pandas ${{ matrix.pandas }}
+        if: matrix.pandas
+        run: pip install "pandas==${{ matrix.pandas }}.*" "pandas-stubs>=2.2,<2.4" "numpy<2.3"
+
+      - name: Show resolved versions
+        run: python -c "import sys, pandas, numpy, talib, yfinance; print(sys.version); print('pandas', pandas.__version__, 'numpy', numpy.__version__, 'talib', talib.__version__, 'yfinance', yfinance.__version__)"
+
+      - name: mypy
+        run: mypy
+
+      - name: pytest (with coverage)
+        run: pytest --cov --cov-report=term-missing --cov-report=xml
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo "### Coverage (Python ${{ matrix.python-version }} ${{ matrix.pandas }})"
+            echo '```'
+            python -m coverage report --format=text || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-${{ matrix.python-version }}${{ matrix.pandas && format('-pandas{0}', matrix.pandas) || '' }}
+          path: EdgeQuantAI-main/coverage.xml
+          if-no-files-found: ignore

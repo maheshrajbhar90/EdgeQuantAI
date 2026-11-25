@@ -1,0 +1,215 @@
+{
+ "kind": "frame",
+ "shape": [
+  2,
+  32
+ ],
+ "columns": [
+  "Date",
+  "Ticker",
+  "Close",
+  "Change%",
+  "Volume",
+  "VMA20",
+  "Z_score",
+  "Volume_Spike",
+  "EMA5",
+  "EMA9",
+  "EMA26",
+  "SMA50",
+  "SMA200",
+  "EMA_Crossover",
+  "Pivot_point",
+  "Resistance_1",
+  "Resistance_2",
+  "Resistance_3",
+  "Support_1",
+  "Support_2",
+  "Support_3",
+  "RSI_Value",
+  "RSI>=60",
+  "MACD_Value",
+  "Signal_Value",
+  "MACD_Crossover",
+  "BB_Direction",
+  "Stoch_Direction",
+  "ATR_Direction",
+  "ADX_Direction",
+  "Pattern",
+  "Code"
+ ],
+ "dtypes": [
+  "datetime64[<unit>]",
+  "<string-like>",
+  "float64",
+  "float64",
+  "int64",
+  "float64",
+  "float64",
+  "bool",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "<string-like>",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "bool",
+  "float64",
+  "float64",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "float64"
+ ],
+ "index_name": null,
+ "index_dtype": "int64",
+ "index": [
+  0,
+  1
+ ],
+ "data": {
+  "Date": [
+   {
+    "timestamp": "2024-03-22T05:30:00"
+   },
+   {
+    "timestamp": "2023-12-15T05:30:00"
+   }
+  ],
+  "Ticker": [
+   "AAA",
+   "BBB"
+  ],
+  "Close": [
+   1564.22,
+   1404.93
+  ],
+  "Change%": [
+   -0.01,
+   0.03
+  ],
+  "Volume": [
+   4000000,
+   1060089
+  ],
+  "VMA20": [
+   1304403.1,
+   1116342.0
+  ],
+  "Z_score": [
+   4.0,
+   -0.34
+  ],
+  "Volume_Spike": [
+   true,
+   false
+  ],
+  "EMA5": [
+   1573.51,
+   1363.6
+  ],
+  "EMA9": [
+   1577.69,
+   1352.93
+  ],
+  "EMA26": [
+   1563.18,
+   1318.15
+  ],
+  "SMA50": [
+   1533.18,
+   1260.55
+  ],
+  "SMA200": [
+   1316.27,
+   1166.07
+  ],
+  "EMA_Crossover": [
+   "",
+   ""
+  ],
+  "Pivot_point": [
+   1568.48,
+   1407.97
+  ],
+  "Resistance_1": [
+   1581.32,
+   1412.87
+  ],
+  "Resistance_2": [
+   1598.43,
+   1420.8
+  ],
+  "Resistance_3": [
+   1611.27,
+   1425.7
+  ],
+  "Support_1": [
+   1551.37,
+   1400.04
+  ],
+  "Support_2": [
+   1538.53,
+   1395.14
+  ],
+  "Support_3": [
+   1521.42,
+   1387.21
+  ],
+  "RSI_Value": [
+   50.41,
+   66.09
+  ],
+  "RSI>=60": [
+   false,
+   true
+  ],
+  "MACD_Value": [
+   13.82,
+   28.36
+  ],
+  "Signal_Value": [
+   18.8,
+   27.63
+  ],
+  "MACD_Crossover": [
+   "",
+   "Bullish"
+  ],
+  "BB_Direction": [
+   "Bearish",
+   "Bullish"
+  ],
+  "Stoch_Direction": [
+   "Bullish",
+   "Overbought Bullish"
+  ],
+  "ATR_Direction": [
+   "Decreasing",
+   "Increasing"
+  ],
+  "ADX_Direction": [
+   "Weak Trend",
+   "Weak Trend"
+  ],
+  "Pattern": [
+   "long_line",
+   "NaN"
+  ],
+  "Code": [
+   -100.0,
+   "NaN"
+  ]
+ }
+}

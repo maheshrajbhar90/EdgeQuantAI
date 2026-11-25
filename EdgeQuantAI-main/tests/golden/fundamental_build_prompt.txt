@@ -1,0 +1,32 @@
+
+        You are an expert equity analyst. I will give you a stock symbol and some computed financial metrics.
+        Symbol: TCS
+
+        Below is the snapshot of computed metrics (from latest available annual data). Use the metrics,
+        any reasonable assumptions, sector context, and the full fundamental framework to give a clear,
+        structured analysis and a final recommendation: BUY / HOLD / SELL, with 0-100% confidence and 4-6 bullet justifications.
+
+        Snapshot:
+        |---------------|-------------|
+| net_income    |  200        |
+| revenue       | 1000        |
+| ebit          |  300        |
+| total_equity  |  800        |
+| total_debt    |  500        |
+| total_assets  | 2000        |
+| operating_cf  |  250        |
+| fcf           |  200        |
+| roe           |    0.25     |
+| roce          |    0.230769 |
+| pe            |   22.5      |
+| pb            |    3.1      |
+| current_ratio |    1.4      |
+| quick_ratio   |    1.1      |
+
+        Instructions:
+        - Compute or reason about ROE, ROCE, margins, leverage, liquidity, cash flow quality, valuation, governance (if info given).
+        - If information is missing, explicitly state which items are missing and how that affects confidence.
+        - Produce sections: Profitability, Financial Health & Leverage, Cash Flow & Earnings Quality, Valuation, Shareholder Returns & Capital Allocation, Management & Governance, Final Checklist (short bullets), Recommendation (BUY/HOLD/SELL + confidence).
+        - Keep the analysis actionable and concise. Use absolute dates where relevant and call out any data limitations.
+
+        

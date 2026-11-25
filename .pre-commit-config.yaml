@@ -1,0 +1,40 @@
+# Install once with:  pip install -e "EdgeQuantAI-main[dev]" && pre-commit install
+# Run on everything:  pre-commit run --all-files
+#
+# The Python project lives in EdgeQuantAI-main/ (pre-commit must sit at the git root).
+#
+# Excluded from all hooks:
+#   * tests/golden/ and tests/legacy/ are byte-exact fixtures (snapshots of the
+#     original behaviour and a frozen copy of the original code);
+#   * assets/ and config.json are runtime data used by the Streamlit app.
+exclude: ^EdgeQuantAI-main/(tests/(golden|legacy)/|assets/|config\.json$)
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.6
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+      - id: ruff-format
+
+  # mypy runs from your dev environment so it can see TA-Lib, pandas-stubs, etc.
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: bash -c 'cd EdgeQuantAI-main && mypy'
+        language: system
+        types: [python]
+        pass_filenames: false

@@ -1,0 +1,180 @@
+{
+ "kind": "frame",
+ "shape": [
+  1,
+  32
+ ],
+ "columns": [
+  "Date",
+  "Ticker",
+  "Close",
+  "Change%",
+  "Volume",
+  "VMA20",
+  "RSI_Value",
+  "RSI>=60",
+  "MACD_Value",
+  "Signal_Value",
+  "MACD_Crossover",
+  "Volume_Spike",
+  "Z_score",
+  "BB_Direction",
+  "Stoch_Direction",
+  "ATR_Direction",
+  "ADX_Direction",
+  "EMA5",
+  "EMA9",
+  "EMA26",
+  "SMA50",
+  "SMA200",
+  "EMA_Crossover",
+  "Pivot_point",
+  "Resistance_1",
+  "Resistance_2",
+  "Resistance_3",
+  "Support_1",
+  "Support_2",
+  "Support_3",
+  "Pattern",
+  "Code"
+ ],
+ "dtypes": [
+  "datetime64[<unit>]",
+  "<string-like>",
+  "float64",
+  "float64",
+  "int64",
+  "float64",
+  "float64",
+  "bool",
+  "float64",
+  "float64",
+  "<string-like>",
+  "bool",
+  "float64",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "<string-like>",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "<string-like>",
+  "float64"
+ ],
+ "index_name": null,
+ "index_dtype": "int64",
+ "index": [
+  0
+ ],
+ "data": {
+  "Date": [
+   {
+    "timestamp": "2024-03-22T05:30:00"
+   }
+  ],
+  "Ticker": [
+   "FLAT"
+  ],
+  "Close": [
+   1564.22
+  ],
+  "Change%": [
+   -0.006390222832024728
+  ],
+  "Volume": [
+   4000000
+  ],
+  "VMA20": [
+   1304403.1
+  ],
+  "RSI_Value": [
+   50.410342468863966
+  ],
+  "RSI>=60": [
+   false
+  ],
+  "MACD_Value": [
+   13.821008887384778
+  ],
+  "Signal_Value": [
+   18.79972798488097
+  ],
+  "MACD_Crossover": [
+   ""
+  ],
+  "Volume_Spike": [
+   true
+  ],
+  "Z_score": [
+   4.001630103842224
+  ],
+  "BB_Direction": [
+   "Bearish"
+  ],
+  "Stoch_Direction": [
+   "Bullish"
+  ],
+  "ATR_Direction": [
+   "Decreasing"
+  ],
+  "ADX_Direction": [
+   "Weak Trend"
+  ],
+  "EMA5": [
+   1573.5057936456692
+  ],
+  "EMA9": [
+   1577.6937189572213
+  ],
+  "EMA26": [
+   1563.1781606115783
+  ],
+  "SMA50": [
+   1533.1847999999995
+  ],
+  "SMA200": [
+   1316.2708999999998
+  ],
+  "EMA_Crossover": [
+   ""
+  ],
+  "Pivot_point": [
+   1568.48
+  ],
+  "Resistance_1": [
+   1581.32
+  ],
+  "Resistance_2": [
+   1598.43
+  ],
+  "Resistance_3": [
+   1611.27
+  ],
+  "Support_1": [
+   1551.37
+  ],
+  "Support_2": [
+   1538.53
+  ],
+  "Support_3": [
+   1521.42
+  ],
+  "Pattern": [
+   "long_line"
+  ],
+  "Code": [
+   -100.0
+  ]
+ }
+}
