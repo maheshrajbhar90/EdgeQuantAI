@@ -312,3 +312,43 @@ def test_fundamental_analyze(legacy: ModuleType, monkeypatch: pytest.MonkeyPatch
     for k in ("symbol", "fmp_ratios", "prompt", "llm_analysis"):
         assert_same(old[k], new[k])
     assert_same(old["metrics"], new["metrics"])
+
+
+# --------------------------------------------------------------------------- #
+# Guard: the differential comparison itself must stay strict
+# --------------------------------------------------------------------------- #
+# The golden-snapshot serializer (conftest.py) deliberately normalises
+# object/str dtypes, datetime64 resolution and scalar module paths so that one
+# snapshot works on pandas 2 and 3. These tests make sure ``assert_same`` does
+# NOT inherit that leniency, so an exact dtype check always exists.
+@pytest.mark.parametrize(
+    ("old", "new"),
+    [
+        (pd.DataFrame({"a": ["x"]}, dtype=object), pd.DataFrame({"a": ["x"]}, dtype="string")),
+        (
+            pd.DataFrame({"t": pd.to_datetime(["2024-01-01"]).astype("datetime64[s]")}),
+            pd.DataFrame({"t": pd.to_datetime(["2024-01-01"]).astype("datetime64[ns]")}),
+        ),
+        (pd.DataFrame({"v": [1]}, dtype="int64"), pd.DataFrame({"v": [1]}, dtype="int32")),
+        (pd.DataFrame({"a": [1], "b": [2]}), pd.DataFrame({"b": [2], "a": [1]})),
+    ],
+    ids=["object-vs-string", "datetime-s-vs-ns", "int64-vs-int32", "column-order"],
+)
+def test_assert_same_is_strict_on_frames(old: pd.DataFrame, new: pd.DataFrame) -> None:
+    with pytest.raises(AssertionError):
+        assert_same(old, new)
+
+
+@pytest.mark.parametrize(
+    ("old", "new"),
+    [
+        ({"x": pd.Timestamp("2024-01-01")}, {"x": "2024-01-01"}),
+        ({"x": 1.0}, {"x": 1}),
+        ({"a": 1, "b": 2}, {"b": 2, "a": 1}),
+        ((1.0, 2.0), (1.0, 2)),
+    ],
+    ids=["timestamp-vs-str", "float-vs-int", "key-order", "tuple-item-type"],
+)
+def test_assert_same_is_strict_on_scalars(old: Any, new: Any) -> None:
+    with pytest.raises(AssertionError):
+        assert_same(old, new)
