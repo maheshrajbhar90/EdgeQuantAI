@@ -84,7 +84,9 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Tests: composite asserts / many params are idiomatic for table-driven checks;
 # N813 because the legacy package is literally named EdgeQuantAI.
-"tests/**" = ["D", "S101", "PLR0913", "PLR0917", "N802", "N813", "PLC0415", "PT018", "RUF012"]
+"tests/**" = ["D", "S101", "PLR0913", "PLR0917", "N802", "N813", "PLC0415", "PT018", "RUF012",
+    "S603",  # subprocess with a fixed argv (sys.executable)
+]
 "tests/fixtures/make_fixture.py" = ["T201"]
 "src/EdgeQuantAI/**" = ["N999"]    # legacy package name kept for compatibility
 "src/stock_technical_analyzer/_talib.py" = ["E501"]
@@ -102,7 +104,7 @@ docstring-code-format = true
 # --------------------------------------------------------------------------- #
 [tool.mypy]
 mypy_path = "src"
-packages = ["stock_technical_analyzer"]
+files = ["src/stock_technical_analyzer", "app_bootstrap.py"]
 strict = true
 warn_unreachable = true
 pretty = true

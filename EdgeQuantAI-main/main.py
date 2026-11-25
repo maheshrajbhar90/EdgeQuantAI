@@ -3,17 +3,18 @@
 import json
 import os
 import re
-import sys
 
 import pandas as pd
 import streamlit as st
+from app_bootstrap import ensure_package_importable
 from huggingface_hub import InferenceClient
 from PIL import Image
 
-# Allow `streamlit run main.py` without `pip install .` (Streamlit Cloud, Codespaces).
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
+# Allow `streamlit run main.py` without `pip install .` (Streamlit Cloud,
+# Codespaces). Adds src/ to sys.path only when the package isn't installed.
+ensure_package_importable()
 
-from EdgeQuantAI import StockTechnicalAnalyzer
+from EdgeQuantAI import StockTechnicalAnalyzer  # noqa: E402
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(BASE_DIR, "assets", "logo.png")
