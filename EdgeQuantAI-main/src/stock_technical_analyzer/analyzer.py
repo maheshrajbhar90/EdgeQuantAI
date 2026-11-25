@@ -62,8 +62,8 @@ class StockTechnicalAnalyzer:
         """Download OHLCV bars for one ticker.
 
         Args:
-            ticker: Base symbol, e.g. ``"RELIANCE"``. The exchange suffix is
-                always appended (``"TCS.NS"`` becomes ``"TCS.NS.NS"``).
+            ticker: Symbol, e.g. ``"RELIANCE"``. The exchange suffix is appended
+                unless the ticker already ends with ``.NS``/``.BO`` (any case).
 
         Returns:
             Frame indexed by naive Asia/Kolkata ``Date`` with ``Close``, ``High``,
@@ -233,7 +233,7 @@ class StockTechnicalAnalyzer:
         Returns ``(latest_pattern_row, signal_or_None)``, or ``None`` if the
         ticker is skipped (reason logged). Exceptions propagate to the caller.
         """
-        raw = data.download(tick + self.exchange_suffix, period, interval)
+        raw = data.download(data.to_yahoo_symbol(tick, self.exchange_suffix), period, interval)
         ohlc_df = data.prepare_downloaded_ohlc(raw, tick)
         if ohlc_df is None:
             return None

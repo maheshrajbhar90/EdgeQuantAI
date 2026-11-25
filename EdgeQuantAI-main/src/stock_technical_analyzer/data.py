@@ -22,6 +22,34 @@ from stock_technical_analyzer import constants as c
 logger = logging.getLogger(__name__)
 
 
+def to_yahoo_symbol(ticker: str, exchange_suffix: str) -> str:
+    """Return the Yahoo Finance symbol for ``ticker``.
+
+    ``exchange_suffix`` is appended unless the ticker already ends with a known
+    exchange suffix (``.NS``, ``.BO``) or with ``exchange_suffix`` itself,
+    compared case-insensitively. An already-qualified ticker is returned as is.
+
+    Args:
+        ticker: Base or already-qualified symbol, e.g. ``"TCS"`` or ``"TCS.NS"``.
+        exchange_suffix: Suffix to append, e.g. ``".NS"``; may be empty.
+
+    Returns:
+        The symbol to request from yfinance.
+
+    Example:
+        >>> to_yahoo_symbol("TCS", ".NS"), to_yahoo_symbol("tcs.ns", ".NS")
+        ('TCS.NS', 'tcs.ns')
+        >>> to_yahoo_symbol("TCS.BO", ".NS")
+        'TCS.BO'
+    """
+    suffixes = {s.upper() for s in c.KNOWN_EXCHANGE_SUFFIXES}
+    if exchange_suffix:
+        suffixes.add(exchange_suffix.upper())
+    if ticker.upper().endswith(tuple(suffixes)):
+        return ticker
+    return ticker + exchange_suffix
+
+
 def download(symbol: str, period: str, interval: str) -> pd.DataFrame:
     """Download adjusted OHLCV bars for one fully-qualified Yahoo symbol.
 
@@ -59,7 +87,8 @@ def fetch_ohlc(
     """Fetch OHLCV bars for ``ticker`` and return them indexed by local date.
 
     Args:
-        ticker: Base symbol; ``exchange_suffix`` is always appended.
+        ticker: Base symbol; ``exchange_suffix`` is appended unless the ticker
+            is already qualified (see :func:`to_yahoo_symbol`).
         exchange_suffix: Suffix such as ``".NS"``.
         period: yfinance period string.
         interval: yfinance interval string.
@@ -72,9 +101,10 @@ def fetch_ohlc(
         IndexError: If yfinance returns single-level columns (the second column
             level is dropped unconditionally).
     """
-    df = download(ticker + exchange_suffix, period, interval)
+    symbol = to_yahoo_symbol(ticker, exchange_suffix)
+    df = download(symbol, period, interval)
     if df.empty:
-        logger.warning("No data returned for %s%s", ticker, exchange_suffix)
+        logger.warning("No data returned for %s", symbol)
         return None
 
     df = df.droplevel(level=1, axis=1)

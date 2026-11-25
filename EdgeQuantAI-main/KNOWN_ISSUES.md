@@ -1,10 +1,11 @@
 # Known issues
 
-Bugs and inconsistencies found during the 0.1.0 refactor. The refactor was
-behaviour-preserving, so **none of these have been fixed**. Every item is still
-present, and the golden tests in `tests/` pin the current behaviour. Fixing one
-is a deliberate behaviour change: update the relevant snapshot in the same PR
-and add a `CHANGELOG.md` entry.
+Bugs and inconsistencies found during the 0.1.0 refactor. The refactor itself
+was behaviour-preserving. Items marked **✅ Fixed** have since been fixed, each in
+its own commit with a regression test in `tests/test_known_issue_fixes.py`. Where
+a fix makes the package differ from the original code, the matching test in
+`tests/test_differential.py` is marked `divergence("<ID>", ...)`. Open items are
+still present, and the golden tests pin their current behaviour.
 
 Locations are given as **original** (`EdgeQuantAI/EdgeQuantAI.py` or
 `EdgeQuantAI/fundamental_analyzer.py` at commit `811823c`) and **now** (paths
@@ -16,7 +17,11 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 
 ## A. Data fetching
 
-### A1 🔴 Exchange suffix is appended even when the ticker already has it
+### A1 🔴 Exchange suffix is appended even when the ticker already has it — ✅ Fixed
+- **Status:** fixed in commit `fix(data): don't append the exchange suffix twice (A1)`.
+  `data.to_yahoo_symbol` now skips the suffix when the ticker already ends with
+  `.NS`/`.BO` (or the configured suffix), compared case-insensitively. It's used by
+  `fetch_ohlc`, the multi-ticker pipeline and `FundamentalAnalyser.fetch_yf_financials`.
 - **Original:** `EdgeQuantAI.py:46`, `:432` · **Now:** `data.py:75`, `analyzer.py:236`
 - **Problem:** `ticker + exchange_suffix` is unconditional. `fetch_ohlc("TCS.NS")`
   requests `TCS.NS.NS`, which returns nothing. The old README example

@@ -16,6 +16,8 @@ DEFAULT_PERIOD: Final = "5y"
 DEFAULT_INTERVAL: Final = "1d"
 DEFAULT_EXCHANGE_SUFFIX: Final = ".NS"
 LOCAL_TIMEZONE: Final = "Asia/Kolkata"
+#: Suffixes that mark a ticker as already exchange-qualified (NSE, BSE).
+KNOWN_EXCHANGE_SUFFIXES: Final = (".NS", ".BO")
 
 # --------------------------------------------------------------------------- #
 # OHLCV / identifier columns
