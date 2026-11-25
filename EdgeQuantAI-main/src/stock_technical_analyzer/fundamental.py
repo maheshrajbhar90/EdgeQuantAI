@@ -155,10 +155,10 @@ class FundamentalAnalyser:
         ebit = _cell(income, OPERATING_INCOME, ic)
         total_equity = _cell(balance, TOTAL_EQUITY, bc)
         total_assets = _cell(balance, TOTAL_ASSETS, bc)
-        # NB: DataFrame.get looks up *columns*, not rows; see KNOWN_ISSUES.md.
+        # Line items are rows (KNOWN_ISSUES F1). A missing row counts as 0, and a
+        # total of 0 falls back to info["totalDebt"], as before.
         total_debt = (
-            balance.get(LONG_TERM_DEBT, pd.Series()).get(bc, 0)
-            + balance.get(SHORT_TERM_DEBT, pd.Series()).get(bc, 0)
+            (_cell(balance, LONG_TERM_DEBT, bc) or 0) + (_cell(balance, SHORT_TERM_DEBT, bc) or 0)
         ) or info.get("totalDebt")
         operating_cf = _cell(cash, OPERATING_CASH_FLOW, cc)
         capex = _cell(cash, CAPEX, cc)

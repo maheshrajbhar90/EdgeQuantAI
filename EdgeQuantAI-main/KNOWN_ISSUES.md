@@ -152,7 +152,10 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 
 ## F. Fundamental analyser (`fundamental.py`)
 
-### F1 🔴 Debt lookup reads *columns*, not rows
+### F1 🔴 Debt lookup reads *columns*, not rows — ✅ Fixed
+- **Status:** fixed in commit `fix(fundamental): read debt from balance-sheet rows (F1)`.
+  `Long Term Debt` + `Short Term Debt` are now read from the latest column's rows; a
+  total of 0 still falls back to `info["totalDebt"]`.
 - **Original:** `fundamental_analyzer.py:71-74` · **Now:** `fundamental.py:156`
 - **Problem:** `balance.get("Long Term Debt", ...)` looks up a *column*, but statement
   line items are *rows*. It always yields `0 + 0`, so `total_debt` always falls back
@@ -166,6 +169,10 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   use names like `"Stockholders Equity"`, `"Operating Cash Flow"` and
   `"Capital Expenditure"`. If so, `total_equity`, `operating_cf`, `fcf`, `roe` and
   `roce` are always `None`. Check against live `Ticker(...).balance_sheet.index`.
+  *Checked on RELIANCE.NS (Nov 2026):* `Total Stockholder Equity` and
+  `Short Term Debt` are absent; the real rows are `Stockholders Equity` and
+  `Current Debt` (`Long Term Debt` and `Total Debt` exist). After the F1 fix, debt
+  therefore picks up long-term debt only, until this label issue is fixed.
 - **Suggested fix:** try a list of candidate labels per item.
 
 ### F3 🟠 FCF sign
