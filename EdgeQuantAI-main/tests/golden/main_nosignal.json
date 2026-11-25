@@ -1,0 +1,180 @@
+{
+ "kind": "frame",
+ "shape": [
+  1,
+  32
+ ],
+ "columns": [
+  "Date",
+  "Ticker",
+  "Close",
+  "Change%",
+  "Volume",
+  "VMA20",
+  "Z_score",
+  "Volume_Spike",
+  "EMA5",
+  "EMA9",
+  "EMA26",
+  "SMA50",
+  "SMA200",
+  "EMA_Crossover",
+  "Pivot_point",
+  "Resistance_1",
+  "Resistance_2",
+  "Resistance_3",
+  "Support_1",
+  "Support_2",
+  "Support_3",
+  "RSI_Value",
+  "RSI>=60",
+  "MACD_Value",
+  "Signal_Value",
+  "MACD_Crossover",
+  "BB_Direction",
+  "Stoch_Direction",
+  "ATR_Direction",
+  "ADX_Direction",
+  "Pattern",
+  "Code"
+ ],
+ "dtypes": [
+  "datetime64[<unit>]",
+  "<string-like>",
+  "float64",
+  "float64",
+  "int64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "float64"
+ ],
+ "index_name": null,
+ "index_dtype": "int64",
+ "index": [
+  0
+ ],
+ "data": {
+  "Date": [
+   {
+    "timestamp": "2023-10-10T05:30:00"
+   }
+  ],
+  "Ticker": [
+   "NOSIG"
+  ],
+  "Close": [
+   1150.66
+  ],
+  "Change%": [
+   "NaN"
+  ],
+  "Volume": [
+   1139239
+  ],
+  "VMA20": [
+   1186779.0
+  ],
+  "Z_score": [
+   -0.23
+  ],
+  "Volume_Spike": [
+   "NaN"
+  ],
+  "EMA5": [
+   1158.86
+  ],
+  "EMA9": [
+   1172.82
+  ],
+  "EMA26": [
+   1187.29
+  ],
+  "SMA50": [
+   1176.9
+  ],
+  "SMA200": [
+   1107.91
+  ],
+  "EMA_Crossover": [
+   "NaN"
+  ],
+  "Pivot_point": [
+   "NaN"
+  ],
+  "Resistance_1": [
+   "NaN"
+  ],
+  "Resistance_2": [
+   "NaN"
+  ],
+  "Resistance_3": [
+   "NaN"
+  ],
+  "Support_1": [
+   "NaN"
+  ],
+  "Support_2": [
+   "NaN"
+  ],
+  "Support_3": [
+   "NaN"
+  ],
+  "RSI_Value": [
+   "NaN"
+  ],
+  "RSI>=60": [
+   "NaN"
+  ],
+  "MACD_Value": [
+   "NaN"
+  ],
+  "Signal_Value": [
+   "NaN"
+  ],
+  "MACD_Crossover": [
+   "NaN"
+  ],
+  "BB_Direction": [
+   "Bearish"
+  ],
+  "Stoch_Direction": [
+   "Bullish"
+  ],
+  "ATR_Direction": [
+   "Decreasing"
+  ],
+  "ADX_Direction": [
+   "Weak Trend"
+  ],
+  "Pattern": [
+   "spinning_top"
+  ],
+  "Code": [
+   100.0
+  ]
+ }
+}

@@ -1,0 +1,33 @@
+{
+ "kind": "tuple",
+ "items": [
+  [
+   "builtins.float",
+   1568.48
+  ],
+  [
+   "builtins.float",
+   1581.32
+  ],
+  [
+   "builtins.float",
+   1598.43
+  ],
+  [
+   "builtins.float",
+   1611.27
+  ],
+  [
+   "builtins.float",
+   1551.37
+  ],
+  [
+   "builtins.float",
+   1538.53
+  ],
+  [
+   "builtins.float",
+   1521.42
+  ]
+ ]
+}
