@@ -1,11 +1,37 @@
-# Sensitive config files
+# --- Secrets / local config -------------------------------------------------
+# NB: config.json and assets/nse_symbols.csv are listed here but are *tracked*
+# (so these two entries have no effect). See KNOWN_ISSUES.md.
 config.json
 .env
 .streamlit/secrets.toml
 
-# Python cache files
-__pycache__/
-*.pyc
-
-# Local data (if you don't want to upload huge CSVs)
+# --- Local data (if you don't want to upload huge CSVs) ---------------------
 assets/nse_symbols.csv
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# --- Virtual environments ---------------------------------------------------
+.venv/
+venv/
+env/
+
+# --- Tooling caches & reports -----------------------------------------------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# --- Editors / OS -----------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+.ipynb_checkpoints/
