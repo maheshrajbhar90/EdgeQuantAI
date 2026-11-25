@@ -12,7 +12,7 @@ PROJECT = Path(__file__).resolve().parent.parent
 BOOTSTRAP = PROJECT / "app_bootstrap.py"
 
 # Runs in a fresh interpreter so pytest's own ``pythonpath = ["src", ...]``
-# can't mask the result. ``-P`` keeps the cwd off sys.path.
+# can't mask the result. ``-I`` (isolated mode, all supported Pythons) keeps the cwd off sys.path.
 _PROBE = textwrap.dedent(
     """
     import importlib.util, json, sys
@@ -45,7 +45,7 @@ _PROBE = textwrap.dedent(
 def _probe(setup: str = "") -> dict[str, object]:
     code = _PROBE.format(bootstrap=str(BOOTSTRAP), setup=setup)
     out = subprocess.run(
-        [sys.executable, "-P", "-c", code], capture_output=True, text=True, check=True, cwd="/"
+        [sys.executable, "-I", "-c", code], capture_output=True, text=True, check=True, cwd="/"
     )
     result: dict[str, object] = json.loads(out.stdout.strip().splitlines()[-1])
     return result
