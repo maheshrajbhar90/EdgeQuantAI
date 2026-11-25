@@ -178,3 +178,57 @@ def test_f1_falls_back_to_info_when_no_debt_rows() -> None:
         "info": {"totalDebt": 7.0},
     }
     assert sta.FundamentalAnalyser().compute_ratios(fin)["total_debt"] == 7.0
+
+
+# --------------------------------------------------------------------------- #
+# C1: importing the library silenced all warnings process-wide
+# --------------------------------------------------------------------------- #
+# numpy, requests and yfinance each register their own narrow filters at
+# import time, so they are imported first; the snapshot then isolates what
+# *this* package does. Runs in a fresh interpreter (the package is already
+# imported in the test process).
+_FILTER_PROBE = """
+import json, sys, warnings
+import numpy, pandas, requests, tabulate, openai, yfinance, talib  # dependencies first
+before = [repr(f) for f in warnings.filters]
+import {module}
+after = [repr(f) for f in warnings.filters]
+print(json.dumps({{"before": before, "after": after}}))
+"""
+
+
+@pytest.mark.parametrize("module", ["stock_technical_analyzer", "EdgeQuantAI", "stock_analyzer"])
+def test_c1_import_leaves_warning_filters_unchanged(module: str) -> None:
+    import json
+    import subprocess
+    import sys
+
+    out = subprocess.run(
+        [sys.executable, "-P", "-c", _FILTER_PROBE.format(module=module)],
+        capture_output=True,
+        text=True,
+        check=True,
+        cwd="/",
+    )
+    result = json.loads(out.stdout.strip().splitlines()[-1])
+    assert result["after"] == result["before"]
+
+
+def test_c1_main_emits_no_warnings_and_restores_filters(fake_yf: FakeYF) -> None:
+    import warnings
+
+    before = list(warnings.filters)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        inner_before = list(warnings.filters)
+        assert sta.StockTechnicalAnalyzer().main(["AAA", "BBB"]) is not None
+        assert warnings.filters == inner_before  # local suppression doesn't leak
+    assert [str(w.message) for w in caught] == []
+    assert warnings.filters == before
+
+
+def test_c1_other_warnings_still_surface() -> None:
+    import warnings
+
+    with pytest.warns(UserWarning, match="still visible"):
+        warnings.warn("still visible", UserWarning, stacklevel=1)

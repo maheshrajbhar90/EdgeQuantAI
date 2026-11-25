@@ -11,6 +11,7 @@ original implementation.
 from __future__ import annotations
 
 import logging
+import warnings
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -352,7 +353,14 @@ class StockTechnicalAnalyzer:
             )
             return None
         final_result = final_result.reindex(columns=list(c.SUMMARY_COLUMNS))
-        return final_result.round(c.PRICE_DECIMALS)
+        # DataFrame.round warns that it can't round the datetime ``Date`` column.
+        # Hide exactly that warning, for this call only (KNOWN_ISSUES C1; the
+        # underlying B4 is still open).
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore", message=r"obj\.round has no effect with datetime", category=UserWarning
+            )
+            return final_result.round(c.PRICE_DECIMALS)
 
     # --------------------------------------------------------------- prompts
     def get_tech_data_for_ticker(self, df: pd.DataFrame, ticker: str) -> dict[Any, Any]:

@@ -89,13 +89,17 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 ### B4 🟡 `round(2)` warns about the datetime column
 - **Now:** `analyzer.py:355`
 - **Problem:** `DataFrame.round` emits `UserWarning: obj.round has no effect with datetime`.
-  You never see it because of C1.
+  Since the C1 fix, `main()` hides exactly this warning around the call.
 - **Suggested fix:** round only the numeric columns: `df.round({col: 2 for col in numeric_cols})`.
 
 ## C. Library hygiene
 
-### C1 🔴 Importing the library silences *all* warnings process-wide
-- **Original:** `EdgeQuantAI.py:9-10` · **Now:** `__init__.py:16`
+### C1 🔴 Importing the library silences *all* warnings process-wide — ✅ Fixed
+- **Status:** fixed in commit `fix: stop silencing all warnings on import (C1)`. The
+  module-level filter is gone. The only warning the library itself triggers
+  (B4's `round` datetime `UserWarning` in `main()`) is suppressed around that one
+  call, by category and message.
+- **Original:** `EdgeQuantAI.py:9-10` · **Was:** `__init__.py:16`
 - **Problem:** `warnings.filterwarnings("ignore")` runs at import time. It hides
   deprecation and pandas warnings for the whole application, not just this library.
 - **Suggested fix:** delete it. Where specific warnings must be suppressed, wrap the
