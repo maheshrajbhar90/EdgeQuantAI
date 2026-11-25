@@ -86,6 +86,7 @@ ignore = [
 # N813 because the legacy package is literally named EdgeQuantAI.
 "tests/**" = ["D", "S101", "PLR0913", "PLR0917", "N802", "N813", "PLC0415", "PT018", "RUF012",
     "S603",  # subprocess with a fixed argv (sys.executable)
+    "S106",  # dummy credentials in tests
 ]
 "tests/fixtures/make_fixture.py" = ["T201"]
 "src/EdgeQuantAI/**" = ["N999"]    # legacy package name kept for compatibility
@@ -104,7 +105,7 @@ docstring-code-format = true
 # --------------------------------------------------------------------------- #
 [tool.mypy]
 mypy_path = "src"
-files = ["src/stock_technical_analyzer", "app_bootstrap.py"]
+files = ["src/stock_technical_analyzer", "app_bootstrap.py", "app_config.py"]
 strict = true
 warn_unreachable = true
 pretty = true

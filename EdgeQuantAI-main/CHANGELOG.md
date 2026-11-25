@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `identify_candlestick_patterns` always adds `Pattern`/`Code` (NaN when
   nothing matches), so `main()` / `get_latest_candlestick_patterns()` no longer
   raise `KeyError` when no ticker has a candlestick match (KNOWN_ISSUES B1).
+- Streamlit app: `main.py` no longer crashes when `config.json` is missing. Keys
+  are read from `st.secrets`, then the `HF_TOKEN` / `OPENAI_API_KEY` /
+  `FMP_API_KEY` environment variables, then `config.json` if present. The
+  OpenAI and FMP keys are now passed to the analyzer (KNOWN_ISSUES G1).
+- `config.json` is no longer tracked; use `config.example.json` as a template.
+  `.streamlit/secrets.toml` is git-ignored at both levels (KNOWN_ISSUES G2).
 - Importing `stock_technical_analyzer` (or `EdgeQuantAI` / `stock_analyzer`) no
   longer calls `warnings.filterwarnings("ignore")`, which silenced every warning
   in the host application. `main()` now suppresses only pandas' "round has no

@@ -215,9 +215,22 @@ from stock_analyzer import StockTechnicalAnalyzer  # name used in earlier docs
 
 ```bash
 pip install -r requirements.txt
-echo '{"API_KEY": "<your Hugging Face token>"}' > config.json   # or use st.secrets
+export HF_TOKEN=...            # your Hugging Face token (see below for alternatives)
 streamlit run main.py
 ```
+
+The app needs a Hugging Face token (`API_KEY`). `OPENAI_API_KEY` and `FMP_API_KEY`
+are optional and are passed to `FundamentalAnalyser`. Each key is read from the
+first source that has it:
+
+| Order | Source | How |
+| --- | --- | --- |
+| 1 | Streamlit secrets | Streamlit Cloud → *Settings → Secrets*, or a local `.streamlit/secrets.toml` with `API_KEY = "..."` |
+| 2 | Environment variables | `HF_TOKEN`, `OPENAI_API_KEY`, `FMP_API_KEY` |
+| 3 | `config.json` (optional) | `cp config.example.json config.json`, then fill in the values |
+
+`config.json` and `.streamlit/secrets.toml` are git-ignored. **Never commit
+real keys.** Values left as `<placeholders>` or empty count as unset.
 
 Type a symbol such as `INFY` and the app builds the technical prompt and sends
 it to `meta-llama/Llama-3.1-8B-Instruct` via the Hugging Face Inference API.

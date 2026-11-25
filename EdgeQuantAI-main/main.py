@@ -1,12 +1,13 @@
 """EdgeQuantAI Streamlit chat app: technical-analysis prompts for NSE symbols via an LLM."""
 
-import json
 import os
 import re
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 from app_bootstrap import ensure_package_importable
+from app_config import load_app_settings
 from huggingface_hub import InferenceClient
 from PIL import Image
 
@@ -34,37 +35,18 @@ st.set_page_config(
 )
 # ===================== LOAD CONFIG =====================
 working_dir = os.path.dirname(os.path.abspath(__file__))
-# NB: raises if config.json is missing, even when st.secrets is set (KNOWN_ISSUES.md).
-with open(f"{working_dir}/config.json") as _config_file:
-    config_data = json.load(_config_file)
 
+# Keys come from st.secrets, then environment variables (HF_TOKEN,
+# OPENAI_API_KEY, FMP_API_KEY), then config.json if it exists. See
+# config.example.json and app_config.py.
+settings = load_app_settings(st.secrets, Path(working_dir))
+API_KEY = settings["API_KEY"]
 
-# Check if we are on Streamlit Cloud (st.secrets) or Local (config.json)
-
-# Get absolute path of current file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-config_path = os.path.join(BASE_DIR, "config.json")
-
-API_KEY = None
-
-# 1️⃣ Try Streamlit Secrets (Cloud)
-try:
-    API_KEY = st.secrets.get("API_KEY")
-except Exception:
-    API_KEY = None
-
-# 2️⃣ Fallback to local config.json (Codespaces / local dev)
-if not API_KEY and os.path.exists(config_path):
-    try:
-        with open(config_path) as f:
-            config_data = json.load(f)
-            API_KEY = config_data.get("API_KEY")
-    except Exception:
-        pass
-
-# 3️⃣ Final validation
 if not API_KEY:
-    st.error("API Key not found. Set it in Streamlit Secrets or config.json")
+    st.error(
+        "API Key not found. Set API_KEY in Streamlit Secrets, the HF_TOKEN "
+        "environment variable, or config.json (see config.example.json)."
+    )
     st.stop()
 
 # 4️⃣ Correct header format for Hugging Face router
@@ -73,7 +55,9 @@ headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/js
 # API_KEY = config_data["Hugging_face"]
 
 # client = OpenAI(api_key=API_KEY)
-analyzer = StockTechnicalAnalyzer()
+analyzer = StockTechnicalAnalyzer(
+    fmp_api_key=settings["FMP_API_KEY"], openai_key=settings["OPENAI_API_KEY"]
+)
 client = InferenceClient(api_key=API_KEY)
 
 
