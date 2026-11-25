@@ -17,6 +17,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 
 ## A. Data fetching
 
+<a id="a1"></a>
+
 ### A1 🔴 Exchange suffix is appended even when the ticker already has it — ✅ Fixed
 - **Status:** fixed in commit `654c91a` (`fix(data): don't append the exchange suffix twice (A1)`).
   `data.to_yahoo_symbol` now skips the suffix when the ticker already ends with
@@ -29,12 +31,16 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   `test_fetch_ohlc_appends_suffix_even_if_present`.
 - **Suggested fix:** append only when `not ticker.upper().endswith(exchange_suffix.upper())`.
 
+<a id="a2"></a>
+
 ### A2 🟠 Daily bars are time-shifted to 05:30
 - **Original:** `EdgeQuantAI.py:62-66`, `:464-468` · **Now:** `data.py:84`, `data.py:126`
 - **Problem:** yfinance returns *naive* dates for daily bars. `pd.to_datetime(..., utc=True)`
   treats them as UTC midnight, and converting to Asia/Kolkata gives `05:30:00` on
   every daily bar. Pinned by `test_fetch_ohlc_daily_dates_shift_to_0530`.
 - **Suggested fix:** convert only tz-aware indexes; leave naive daily dates unchanged.
+
+<a id="a3"></a>
 
 ### A3 🟠 Two different normalisation paths
 - **Original:** `fetch_ohlc` (`:44-70`) vs. `get_latest_candlestick_patterns` (`:439-482`)
@@ -46,6 +52,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** route both through `prepare_downloaded_ohlc` and have `fetch_ohlc`
   return `None` instead of raising.
 
+<a id="a4"></a>
+
 ### A4 🟡 Default `period` is `"5y"` but the docs said `"3y"` (and the example `"1y"`)
 - **Original:** `EdgeQuantAI.py:32` · **Now:** `constants.py:15`
 - **Problem:** the old README's "Class Structure" listed `period="3y"`. The code has
@@ -53,6 +61,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** decide on one default. `"5y"` is fine: the indicators need ≥ 200 bars.
 
 ## B. Multi-ticker pipeline (`get_latest_candlestick_patterns` / `main`)
+
+<a id="b1"></a>
 
 ### B1 🔴 `KeyError` when no ticker has any candlestick match — ✅ Fixed
 - **Status:** fixed in commit `fa39355` (`fix(patterns): always add Pattern/Code columns (B1)`).
@@ -67,6 +77,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** `final_result_df.reindex(columns=[...])` before the merge, or
   always create both columns in `identify_candlestick_patterns`.
 
+<a id="b2"></a>
+
 ### B2 🟠 Tickers without a signal disappear, unless no ticker has one
 - **Now:** `analyzer.py` `_merge_patterns_and_signals`
 - **Problem:** the merge is a *left* join from the signal rows, so a ticker with no
@@ -77,6 +89,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** left-join signals onto the pattern rows, so every processed ticker
   appears, and add a boolean `Has_Signal` column.
 
+<a id="b3"></a>
+
 ### B3 🟠 `Change%` holds a fraction, not a percentage, rounded to 2 dp
 - **Original:** `EdgeQuantAI.py:179`, `:230`, `:568` · **Now:** `indicators.py`
   (`Change`), `signals.py` (`Change%`), `analyzer.py:355`
@@ -86,6 +100,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** store `pct_change() * 100` under `Change%`, or rename the key to
   `Change` and round it to 4 dp.
 
+<a id="b4"></a>
+
 ### B4 🟡 `round(2)` warns about the datetime column
 - **Now:** `analyzer.py:355`
 - **Problem:** `DataFrame.round` emits `UserWarning: obj.round has no effect with datetime`.
@@ -93,6 +109,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** round only the numeric columns: `df.round({col: 2 for col in numeric_cols})`.
 
 ## C. Library hygiene
+
+<a id="c1"></a>
 
 ### C1 🔴 Importing the library silences *all* warnings process-wide — ✅ Fixed
 - **Status:** fixed in commit `5370091` (`fix: stop silencing all warnings on import (C1)`). The
@@ -105,6 +123,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** delete it. Where specific warnings must be suppressed, wrap the
   call in `with warnings.catch_warnings(): warnings.simplefilter("ignore", SomeWarning)`.
 
+<a id="c2"></a>
+
 ### C2 🟠 `FundamentalAnalyser` ignores the analyzer's `exchange_suffix`
 - **Original:** `EdgeQuantAI.py:33-36` · **Now:** `analyzer.py:55`
 - **Problem:** `StockTechnicalAnalyzer(exchange_suffix="")` still builds a
@@ -112,6 +132,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** pass `exchange_suffix=exchange_suffix`.
 
 ## D. Indicators, patterns and signals
+
+<a id="d1"></a>
 
 ### D1 🟠 Only the *last* matching candlestick pattern is kept
 - **Original:** `EdgeQuantAI.py:349-353` · **Now:** `patterns.py`
@@ -124,6 +146,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** collect all matches per bar (e.g. `"doji|spinning_top"`) or use an
   explicit priority order.
 
+<a id="d2"></a>
+
 ### D2 🟡 Edge cases in the direction labels
 - **Now:** `signals.py`
 - **Problem:**
@@ -134,6 +158,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   All are pinned by parametrised tests.
 - **Suggested fix:** return `"Neutral"` for NaN or equal values.
 
+<a id="d3"></a>
+
 ### D3 🟡 The prompt names indicators the data doesn't contain
 - **Now:** `prompts.py` (`SIMPLE_TEMPLATE`)
 - **Problem:** the prompt says *"Evaluate short-term trend (EMA/SMA 5, 10, 20)"*, but the
@@ -142,6 +168,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   so regenerate the `build_prompt_*.txt` snapshots.
 
 ## E. Prompt formatting
+
+<a id="e1"></a>
 
 ### E1 🟠 `textwrap.dedent` runs *after* the metrics are interpolated
 - **Original:** `EdgeQuantAI.py:612`, `:618-692` · **Now:** `prompts.py`
@@ -156,6 +184,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 
 ## F. Fundamental analyser (`fundamental.py`)
 
+<a id="f1"></a>
+
 ### F1 🔴 Debt lookup reads *columns*, not rows — ✅ Fixed
 - **Status:** fixed in commit `62e6cf2` (`fix(fundamental): read debt from balance-sheet rows (F1)`).
   `Long Term Debt` + `Short Term Debt` are now read from the latest column's rows; a
@@ -166,8 +196,10 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   to `info["totalDebt"]`. Pinned by `fundamental_compute_ratios.json`.
 - **Suggested fix:** use `_cell(balance, LONG_TERM_DEBT, bc) or 0`.
 
+<a id="f2a"></a>
+
 ### F2a 🔴 Short-term debt label (`Current Debt`) — ✅ Fixed
-- **Status:** fixed in commit `fix(fundamental): read "Current Debt" as short-term debt (F2a)`.
+- **Status:** fixed in commit `1c9ba99` (`fix(fundamental): read "Current Debt" as short-term debt (F2a)`).
   Split out of F2 because the F1 fix alone made live `total_debt` long-term-only.
   Short-term debt is now read from the first present label in
   `("Short Term Debt", "Current Debt")`.
@@ -175,6 +207,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   \+ 1036.7 bn (`Current Debt`) = 3744.2 bn. The balance sheet's own `Total Debt`
   row is 3980.0 bn; the difference is lease obligations, which are not counted.
   The old `info["totalDebt"]` value was 5020.5 bn.
+
+<a id="f2"></a>
 
 ### F2 🔴 Remaining statement row labels don't match current yfinance (open)
 - **Now:** `fundamental.py` (row-label constants)
@@ -188,11 +222,15 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   once the capex label resolves, `fcf` goes live with the wrong sign unless F3 is
   fixed in the same change.
 
+<a id="f3"></a>
+
 ### F3 🟠 FCF sign
 - **Now:** `fundamental.py` (`fcf = operating_cf - capex`)
 - **Problem:** yfinance usually reports capital expenditure as a *negative* number, in
   which case `ocf - capex` overstates free cash flow. Verify with live data.
 - **Suggested fix:** `operating_cf + capex` if capex is negative, or `operating_cf - abs(capex)`.
+
+<a id="f4"></a>
 
 ### F4 🟡 `earnings` is fetched but never used
 - **Now:** `fundamental.py:108`
@@ -201,6 +239,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** drop it from the dict, which changes the dict's keys.
 
 ## G. Streamlit app and repository
+
+<a id="g1"></a>
 
 ### G1 🔴 `main.py` crashes without `config.json`, even when Streamlit secrets are set — ✅ Fixed
 - **Status:** fixed in commit `55714ad` (`fix(app): load keys without config.json; stop tracking it (G1, G2)`).
@@ -213,6 +253,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** delete the unconditional load (lines 36-38) but keep `working_dir`,
   which `load_nse_symbols` uses. The fallback below already handles a missing file.
 
+<a id="g2"></a>
+
 ### G2 🔴 `config.json` is tracked despite being in `.gitignore` — ✅ Fixed
 - **Status:** fixed in the same commit as G1. `config.json` is no longer tracked
   (`git rm --cached`), `config.example.json` holds placeholders only, and both
@@ -223,6 +265,8 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   key locally will see it as a modified file and could commit the secret.
 - **Suggested fix:** `git rm --cached config.json`, then commit `config.example.json`.
 
+<a id="g3"></a>
+
 ### G3 🟠 `requirements.txt` (used by Streamlit Cloud)
 - **Problem:** it lists `pandas-ta`, which nothing imports, and
   `--extra-index-url https://pypi.debian.net/`, an unusual extra index and a
@@ -230,8 +274,12 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** drop both, and pin, or install the package with `.` / `-e .` and
   add only the app's extra dependencies.
 
+<a id="g4"></a>
+
 ### G4 🟡 `.gitignore` lists `assets/nse_symbols.csv`, which the app needs (and is tracked)
 - **Suggested fix:** remove the entry.
+
+<a id="g5"></a>
 
 ### G5 🟡 The Python project lives in an `EdgeQuantAI-main/` sub-folder
 - **Problem:** this looks like an extracted GitHub zip. CI and pre-commit need

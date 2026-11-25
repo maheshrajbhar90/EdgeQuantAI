@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Behaviour changes
+Intentional output changes compared with 0.1.0 (and the original 0.0.0.1 code).
+Each one is tracked by a regression test in `tests/test_known_issue_fixes.py`
+and a strict `divergence(...)` marker or an updated expectation.
+
+- **A1: exchange suffix ([KNOWN_ISSUES A1](KNOWN_ISSUES.md#a1))**
+  - *Before:* the suffix was always appended. `fetch_ohlc("TCS.NS")` requested
+    `TCS.NS.NS` and returned `None`; `main(["TCS.NS"])` silently skipped the
+    ticker; `FundamentalAnalyser.fetch_yf_financials("TCS.NS")` looked up `TCS.NS.NS`.
+  - *After:* tickers already ending in `.NS`/`.BO` (any case) are used as given,
+    so `"TCS.NS"` → `TCS.NS`, `"tcs.ns"` → `tcs.ns` and `"TCS.BO"` → `TCS.BO`.
+    `"TCS"` still becomes `TCS.NS`. The `Ticker` column keeps the spelling you
+    passed in.
+- **B1: `Pattern`/`Code` columns ([KNOWN_ISSUES B1](KNOWN_ISSUES.md#b1))**
+  - *Before:* `identify_candlestick_patterns` left out `Pattern`/`Code` when no
+    pattern matched, so `main()` and `get_latest_candlestick_patterns()` raised
+    `KeyError: "['Pattern', 'Code'] not in index"` when no ticker matched.
+  - *After:* both columns are always present (`Pattern` object, `Code` float64,
+    NaN where nothing matched), and the pipeline returns rows instead of raising.
+    Output is unchanged whenever at least one pattern matched.
+- **F1: debt lookup ([KNOWN_ISSUES F1](KNOWN_ISSUES.md#f1), with [F2a](KNOWN_ISSUES.md#f2a))**
+  - *Before:* `compute_ratios` looked up debt in the balance sheet's *columns*,
+    always got 0 and fell back to `info["totalDebt"]` (`None` if missing). `roce`
+    was based on that value. Example: 5020.5 bn for RELIANCE.NS.
+  - *After:* `total_debt` = `Long Term Debt` + short-term debt from the latest
+    fiscal-year column. Short-term debt is the first of `Short Term Debt` /
+    `Current Debt` present (F2a). `info["totalDebt"]` is still the fallback when
+    that sum is 0, so TCS.NS and INFY.NS are unchanged. `roce` changes with it.
+    Example: 3744.2 bn for RELIANCE.NS.
+  - **Limitation:** F1 alone counted long-term debt only on live yfinance data,
+    because current yfinance has no `Short Term Debt` row (2707.5 bn for
+    RELIANCE.NS). F2a closes that gap by reading `Current Debt`. Lease
+    obligations are still not counted (the balance sheet's `Total Debt` is
+    3980.0 bn), and `roe`/`roce` still need the equity label from the open
+    [F2](KNOWN_ISSUES.md#f2).
+
 ### Fixed
 - Tickers that already end with `.NS`/`.BO` (any case) no longer get the
   exchange suffix appended again (`"TCS.NS"` used to request `TCS.NS.NS`), in
