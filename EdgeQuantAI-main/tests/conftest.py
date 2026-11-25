@@ -176,6 +176,57 @@ def serialise(obj: Any) -> Any:
     raise TypeError(f"unsupported snapshot object: {type(obj)!r}")
 
 
+# Floats are compared with a tight *relative* tolerance. Snapshots were recorded on
+# macOS arm64; Linux x86-64 (CI) computes rolling std / TA-Lib results that can
+# differ in the last bits (different libm, FMA contraction). 1e-9 absorbs that
+# but is many orders of magnitude below any real behaviour change. Everything
+# else (types, dtypes, columns, index, strings, bools, NaN positions) is exact.
+# The differential test still compares old vs new exactly, in one interpreter.
+FLOAT_NOISE: dict[str, float] = {}  # snapshot -> largest tolerated relative diff
+FLOAT_REL_TOL = 1e-9
+FLOAT_ABS_TOL = 1e-12
+
+
+def _diff_float(
+    expected: float, actual: float, path: str, out: list[str], worst: list[float]
+) -> None:
+    if not math.isclose(expected, actual, rel_tol=FLOAT_REL_TOL, abs_tol=FLOAT_ABS_TOL):
+        out.append(f"{path}: {expected!r} != {actual!r}")
+    elif expected != actual:
+        worst[0] = max(worst[0], abs(expected - actual) / max(abs(expected), 1e-300))
+
+
+def _diff(expected: Any, actual: Any, path: str, out: list[str], worst: list[float]) -> None:
+    if type(expected) is float and type(actual) is float:
+        _diff_float(expected, actual, path, out, worst)
+        return
+    if type(expected) is not type(actual):
+        out.append(f"{path}: type {type(expected).__name__} != {type(actual).__name__}")
+    elif isinstance(expected, dict):
+        if list(expected) != list(actual):
+            out.append(f"{path}: keys {list(expected)} != {list(actual)}")
+        else:
+            for k in expected:
+                _diff(expected[k], actual[k], f"{path}.{k}", out, worst)
+    elif isinstance(expected, list):
+        if len(expected) != len(actual):
+            out.append(f"{path}: length {len(expected)} != {len(actual)}")
+        else:
+            for i, (e, a) in enumerate(zip(expected, actual, strict=True)):
+                _diff(e, a, f"{path}[{i}]", out, worst)
+    elif expected != actual:
+        out.append(f"{path}: {expected!r} != {actual!r}")
+
+
+def assert_matches_snapshot(expected: Any, actual: Any, name: str) -> float:
+    """Assert structural equality (floats within tolerance); return max rel float diff."""
+    problems: list[str] = []
+    worst = [0.0]
+    _diff(expected, actual, "$", problems, worst)
+    assert not problems, f"{name}: {len(problems)} difference(s), first: " + "; ".join(problems[:5])
+    return worst[0]
+
+
 class Snapshot:
     """``snapshot.check(name, obj)`` compares ``obj`` with ``tests/golden/<name>``."""
 
@@ -192,7 +243,12 @@ class Snapshot:
             return
         assert path.exists(), f"missing golden file {path}; run with UPDATE_GOLDEN=1"
         expected = path.read_text(encoding="utf-8")
-        assert actual == expected, f"output differs from golden snapshot {path.name}"
+        if isinstance(obj, str):
+            assert actual == expected, f"output differs from golden snapshot {path.name}"
+            return
+        worst = assert_matches_snapshot(json.loads(expected), json.loads(actual), path.name)
+        if worst:
+            FLOAT_NOISE[path.name] = max(worst, FLOAT_NOISE.get(path.name, 0.0))
 
 
 @pytest.fixture
@@ -239,3 +295,11 @@ def signal_frame(**overrides: list[Any]) -> pd.DataFrame:
 @pytest.fixture
 def make_signal_frame() -> Callable[..., pd.DataFrame]:
     return signal_frame
+
+
+def pytest_terminal_summary(terminalreporter: Any) -> None:
+    """Report snapshots that matched only within the float tolerance."""
+    if FLOAT_NOISE:
+        terminalreporter.section("golden float noise (within tolerance)")
+        for name, rel in sorted(FLOAT_NOISE.items()):
+            terminalreporter.write_line(f"{name}: max relative diff {rel:.2e}")

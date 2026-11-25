@@ -197,3 +197,32 @@ def test_fmp_failure_log_does_not_leak_api_key(
         assert sta.FundamentalAnalyser(fmp_api_key="SECRET123").fetch_fmp_ratios("TCS") is None
     assert "SECRET123" not in caplog.text
     assert "ConnectionError" in caplog.text
+
+
+# --------------------------------------------------------------------------- #
+# Golden comparator: floats within 1e-9 relative, everything else exact
+# --------------------------------------------------------------------------- #
+def test_snapshot_comparator_tolerates_last_bit_float_noise() -> None:
+    from conftest import assert_matches_snapshot
+
+    worst = assert_matches_snapshot({"x": [1.0, 2.5]}, {"x": [1.0 + 2e-16, 2.5]}, "t")
+    assert 0 < worst < 1e-12
+
+
+@pytest.mark.parametrize(
+    ("expected", "actual"),
+    [
+        ({"x": 1.0}, {"x": 1.0 + 1e-6}),  # real numeric change
+        ({"x": "NaN"}, {"x": 1.0}),  # NaN position
+        ({"x": "float64"}, {"x": "float32"}),  # dtype string
+        ({"x": 1}, {"x": 1.0}),  # int vs float
+        ({"a": 1, "b": 2}, {"b": 2, "a": 1}),  # key order
+        ({"x": [1.0]}, {"x": [1.0, 2.0]}),  # length
+        ({"x": True}, {"x": 1}),  # bool vs int
+    ],
+)
+def test_snapshot_comparator_rejects_real_differences(expected: Any, actual: Any) -> None:
+    from conftest import assert_matches_snapshot
+
+    with pytest.raises(AssertionError):
+        assert_matches_snapshot(expected, actual, "t")
