@@ -23,8 +23,8 @@
   ],
   [
    "total_debt",
-   "builtins.float",
-   555.0
+   "numpy.float64",
+   500.0
   ],
   [
    "total_assets",
@@ -49,7 +49,7 @@
   [
    "roce",
    "numpy.float64",
-   0.22140221402214022
+   0.23076923076923078
   ],
   [
    "pe",

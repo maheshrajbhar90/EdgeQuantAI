@@ -24,6 +24,11 @@ def _frame(rows: dict[str, list[float | None]]) -> pd.DataFrame:
 
 INCOME = _frame({"Net Income": [200.0, 150.0], "Total Revenue": [1000.0, 900.0],
                  "Operating Income": [300.0, 250.0]})  # fmt: skip
+# KNOWN_ISSUES F1 (fixed): the debt rows below are now read, so the snapshots
+# fundamental_compute_ratios{,_nocapex}.json, fundamental_analyze_metrics.json and
+# fundamental_build_prompt.txt have total_debt = 400 + 100 = 500 (numpy.float64)
+# and roce = 300 / (800 + 500). Before: 555.0 from info["totalDebt"], or None
+# when info is None.
 BALANCE = _frame({"Total Stockholder Equity": [800.0, 700.0], "Total Assets": [2000.0, 1800.0],
                   "Long Term Debt": [400.0, 300.0], "Short Term Debt": [100.0, None]})  # fmt: skip
 CASH = _frame({"Total Cash From Operating Activities": [250.0, 200.0],

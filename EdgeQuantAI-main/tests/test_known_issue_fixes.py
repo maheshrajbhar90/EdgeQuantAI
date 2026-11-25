@@ -132,3 +132,49 @@ def test_b1_pipeline_without_any_pattern_match(fake_yf: FakeYF) -> None:
     assert list(summary["Ticker"]) == ["FLATUP"]
     assert summary["Pattern"].isna().all()
     assert summary["Code"].isna().all()
+
+
+# --------------------------------------------------------------------------- #
+# F1: debt lookup read columns instead of rows, so it always returned 0
+# --------------------------------------------------------------------------- #
+# Layout of yfinance ``Ticker.balance_sheet`` (checked against live data):
+# line items are ROWS, fiscal-year end dates are COLUMNS, newest first.
+_YEARS = pd.DatetimeIndex(["2026-03-31", "2025-03-31", "2024-03-31", "2023-03-31"]).astype(
+    "datetime64[us]"
+)
+
+
+def _balance_sheet(rows: dict[str, list[float]]) -> pd.DataFrame:
+    return pd.DataFrame.from_dict(rows, orient="index", columns=_YEARS)
+
+
+_REAL_LAYOUT_ROWS = {
+    "Net Debt": [2.1e12, 1.9e12, 1.7e12, 1.5e12],
+    "Total Debt": [3.6e12, 3.4e12, 3.2e12, 3.0e12],
+    "Long Term Debt And Capital Lease Obligation": [2.9e12, 2.7e12, 2.5e12, 2.3e12],
+    "Long Term Debt": [2.8e12, 2.6e12, 2.4e12, 2.2e12],
+    "Current Debt And Capital Lease Obligation": [7.1e11, 6.9e11, 6.5e11, 6.1e11],
+    "Current Debt": [7.0e11, 6.8e11, 6.4e11, 6.0e11],
+    "Total Assets": [1.9e13, 1.8e13, 1.7e13, 1.6e13],
+}
+
+
+def test_f1_long_term_debt_read_from_rows() -> None:
+    fin = {"balance": _balance_sheet(_REAL_LAYOUT_ROWS), "info": {"totalDebt": 9.99e12}}
+    metrics = sta.FundamentalAnalyser().compute_ratios(fin)
+    # Latest column's "Long Term Debt" row, not the info["totalDebt"] fallback.
+    assert metrics["total_debt"] == 2.8e12
+
+
+def test_f1_long_and_short_term_debt_are_summed() -> None:
+    rows = {"Long Term Debt": [400.0, 300.0, 0.0, 0.0], "Short Term Debt": [100.0, 50.0, 0.0, 0.0]}
+    fin = {"balance": _balance_sheet(rows), "info": {"totalDebt": 555.0}}
+    assert sta.FundamentalAnalyser().compute_ratios(fin)["total_debt"] == 500.0
+
+
+def test_f1_falls_back_to_info_when_no_debt_rows() -> None:
+    fin = {
+        "balance": _balance_sheet({"Total Assets": [1.0, 1.0, 1.0, 1.0]}),
+        "info": {"totalDebt": 7.0},
+    }
+    assert sta.FundamentalAnalyser().compute_ratios(fin)["total_debt"] == 7.0

@@ -12,12 +12,12 @@
 | revenue       | 1000        |
 | ebit          |  300        |
 | total_equity  |  800        |
-| total_debt    |  555        |
+| total_debt    |  500        |
 | total_assets  | 2000        |
 | operating_cf  |  250        |
 | fcf           |  200        |
 | roe           |    0.25     |
-| roce          |    0.221402 |
+| roce          |    0.230769 |
 | pe            |   22.5      |
 | pb            |    3.1      |
 | current_ratio |    1.4      |
