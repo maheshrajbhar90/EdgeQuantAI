@@ -187,7 +187,7 @@ from stock_analyzer import StockTechnicalAnalyzer  # name used in earlier docs
 | `fetch_ohlc(ticker)` | `DataFrame \| None` | Download OHLCV for `ticker` (the exchange suffix is added unless it already ends with `.NS`/`.BO`). `None` if Yahoo returns nothing. |
 | `add_indicators(ohlc)` | `DataFrame \| None` | Copy of `ohlc` with 22 indicator and direction columns. `None` if empty or < 200 rows. |
 | `generate_signal(data)` | `dict \| None` | Latest-bar metrics (30 keys, incl. pivots) if volume, RSI, EMA-cross or MACD-cross fires, else `None`. |
-| `identify_candlestick_patterns(ohlc_df)` | `DataFrame` | Adds `Pattern`/`Code` **in place** and returns the same frame. |
+| `identify_candlestick_patterns(ohlc_df)` | `DataFrame` | Adds `Pattern`/`Code` **in place** (NaN where nothing matches) and returns the same frame. |
 | `support_resistance_level(ohlc_day)` | `tuple[float, ...]` | `(pivot, r1, r2, r3, s1, s2, s3)` from the last row, rounded to 2 dp. |
 | `z_score(df, window=20)` | `DataFrame` | Copy with `vol_mean`, `vol_std`, `vol_zscore`. |
 | `bb_direction(row)` | `str` | `Neutral` / `Strong Bullish` / `Bullish` / `Bearish` / `Strong Bearish`. |

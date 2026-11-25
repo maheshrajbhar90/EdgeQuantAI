@@ -6,6 +6,7 @@ import logging
 from collections.abc import Callable
 from typing import Any, TypeAlias
 
+import numpy as np
 import pandas as pd
 
 from stock_technical_analyzer import constants as c
@@ -30,7 +31,7 @@ def identify_candlestick_patterns(ohlc_df: pd.DataFrame) -> pd.DataFrame:
     Patterns are evaluated in :data:`PATTERN_FUNCTIONS` order; when several
     match the same bar, the later one wins. ``Pattern`` holds the label and
     ``Code`` the TA-Lib output (typically ``+100`` bullish / ``-100`` bearish).
-    Both columns are created lazily, so they are absent if nothing matches.
+    Both columns are always present; bars with no match hold NaN.
 
     Args:
         ohlc_df: Frame with ``Open``, ``High``, ``Low`` and ``Close``. It is
@@ -46,4 +47,10 @@ def identify_candlestick_patterns(ohlc_df: pd.DataFrame) -> pd.DataFrame:
         if hits.any():
             ohlc_df.loc[hits, c.PATTERN] = label
             ohlc_df.loc[hits, c.CODE] = pattern[hits]
+    # Added after the loop (not pre-created) so matched columns keep the dtype
+    # they get from the assignments above. KNOWN_ISSUES B1.
+    if c.PATTERN not in ohlc_df.columns:
+        ohlc_df[c.PATTERN] = pd.Series(np.nan, index=ohlc_df.index, dtype=object)
+    if c.CODE not in ohlc_df.columns:
+        ohlc_df[c.CODE] = np.nan
     return ohlc_df
