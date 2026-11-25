@@ -8,7 +8,7 @@ a fix makes the package differ from the original code, the matching test in
 still present, and the golden tests pin their current behaviour.
 
 Locations are given as **original** (`EdgeQuantAI/EdgeQuantAI.py` or
-`EdgeQuantAI/fundamental_analyzer.py` at commit `811823c`) and **now** (paths
+`EdgeQuantAI/fundamental_analyzer.py` at commit `a1feaa5`) and **now** (paths
 under `src/stock_technical_analyzer/`).
 
 Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cosmetic or docs.
@@ -18,7 +18,7 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 ## A. Data fetching
 
 ### A1 🔴 Exchange suffix is appended even when the ticker already has it — ✅ Fixed
-- **Status:** fixed in commit `7246761` (`fix(data): don't append the exchange suffix twice (A1)`).
+- **Status:** fixed in commit `654c91a` (`fix(data): don't append the exchange suffix twice (A1)`).
   `data.to_yahoo_symbol` now skips the suffix when the ticker already ends with
   `.NS`/`.BO` (or the configured suffix), compared case-insensitively. It's used by
   `fetch_ohlc`, the multi-ticker pipeline and `FundamentalAnalyser.fetch_yf_financials`.
@@ -55,7 +55,7 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 ## B. Multi-ticker pipeline (`get_latest_candlestick_patterns` / `main`)
 
 ### B1 🔴 `KeyError` when no ticker has any candlestick match — ✅ Fixed
-- **Status:** fixed in commit `5ba2ff5` (`fix(patterns): always add Pattern/Code columns (B1)`).
+- **Status:** fixed in commit `fa39355` (`fix(patterns): always add Pattern/Code columns (B1)`).
   `identify_candlestick_patterns` now always returns `Pattern` (object, NaN) and
   `Code` (float64, NaN) columns, so the merge can't fail.
 - **Original:** `EdgeQuantAI.py:540-545` · **Now:** `analyzer.py:279`
@@ -95,7 +95,7 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 ## C. Library hygiene
 
 ### C1 🔴 Importing the library silences *all* warnings process-wide — ✅ Fixed
-- **Status:** fixed in commit `cccfd34` (`fix: stop silencing all warnings on import (C1)`). The
+- **Status:** fixed in commit `5370091` (`fix: stop silencing all warnings on import (C1)`). The
   module-level filter is gone. The only warning the library itself triggers
   (B4's `round` datetime `UserWarning` in `main()`) is suppressed around that one
   call, by category and message.
@@ -157,7 +157,7 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 ## F. Fundamental analyser (`fundamental.py`)
 
 ### F1 🔴 Debt lookup reads *columns*, not rows — ✅ Fixed
-- **Status:** fixed in commit `7fed69d` (`fix(fundamental): read debt from balance-sheet rows (F1)`).
+- **Status:** fixed in commit `62e6cf2` (`fix(fundamental): read debt from balance-sheet rows (F1)`).
   `Long Term Debt` + `Short Term Debt` are now read from the latest column's rows; a
   total of 0 still falls back to `info["totalDebt"]`.
 - **Original:** `fundamental_analyzer.py:71-74` · **Now:** `fundamental.py:156`
@@ -194,7 +194,7 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 ## G. Streamlit app and repository
 
 ### G1 🔴 `main.py` crashes without `config.json`, even when Streamlit secrets are set — ✅ Fixed
-- **Status:** fixed in commit `8d27df5` (`fix(app): load keys without config.json; stop tracking it (G1, G2)`).
+- **Status:** fixed in commit `55714ad` (`fix(app): load keys without config.json; stop tracking it (G1, G2)`).
   The new `app_config.py` reads each key from `st.secrets`, then environment variables
   (`HF_TOKEN`, `OPENAI_API_KEY`, `FMP_API_KEY`), then `config.json` only if the file exists.
 - **Now:** `main.py:38`

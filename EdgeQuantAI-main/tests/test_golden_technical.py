@@ -1,7 +1,7 @@
 """Characterization ("golden") tests for ``StockTechnicalAnalyzer``.
 
 These tests were written and their snapshots generated against the ORIGINAL,
-pre-refactor implementation (commit 811823c). They pin current behaviour,
+pre-refactor implementation (commit a1feaa5). They pin current behaviour,
 including behaviour that looks like a bug (see KNOWN_ISSUES.md). They must not
 be edited as part of a refactor; if one fails, the refactor changed behaviour.
 

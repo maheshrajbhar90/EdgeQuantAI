@@ -92,5 +92,5 @@ against a frozen copy of it enforce this. Bugs found along the way are listed in
   Streamlit chat app.
 
 [Unreleased]: https://github.com/maheshrajbhar90/EdgeQuantAI/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/maheshrajbhar90/EdgeQuantAI/compare/811823c...v0.1.0
-[0.0.0.1]: https://github.com/maheshrajbhar90/EdgeQuantAI/tree/811823c
+[0.1.0]: https://github.com/maheshrajbhar90/EdgeQuantAI/compare/a1feaa5...v0.1.0
+[0.0.0.1]: https://github.com/maheshrajbhar90/EdgeQuantAI/tree/a1feaa5
