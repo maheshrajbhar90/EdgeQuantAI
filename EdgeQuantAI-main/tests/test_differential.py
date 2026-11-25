@@ -181,15 +181,26 @@ def test_generate_signal_every_slice(pair: tuple[Any, Any], indicators: pd.DataF
     run_both(lambda: old.generate_signal(None), lambda: new.generate_signal(None))
 
 
+@pytest.mark.parametrize(
+    "source",
+    [
+        "indicators",
+        "ohlc",
+        pytest.param(
+            "ohlc_3_rows",
+            marks=divergence("B1", "no pattern matches: legacy omits Pattern/Code, new adds NaN"),
+        ),
+    ],
+)
 def test_identify_candlestick_patterns(
-    pair: tuple[Any, Any], indicators: pd.DataFrame, ohlc: pd.DataFrame
+    pair: tuple[Any, Any], indicators: pd.DataFrame, ohlc: pd.DataFrame, source: str
 ) -> None:
     old, new = pair
-    for src in (indicators, ohlc, ohlc.iloc[:3]):
-        a, b = src.copy(), src.copy()
-        ra, rb = old.identify_candlestick_patterns(a), new.identify_candlestick_patterns(b)
-        assert ra is a and rb is b
-        assert_same(ra, rb)
+    src = {"indicators": indicators, "ohlc": ohlc, "ohlc_3_rows": ohlc.iloc[:3]}[source]
+    a, b = src.copy(), src.copy()
+    ra, rb = old.identify_candlestick_patterns(a), new.identify_candlestick_patterns(b)
+    assert ra is a and rb is b
+    assert_same(ra, rb)
 
 
 @pytest.mark.parametrize("rows", [1, 2, 320])

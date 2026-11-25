@@ -268,7 +268,10 @@ def test_identify_candlestick_patterns_no_match_adds_no_columns(
     assert list(flat.columns)[:4] == ["Open", "High", "Low", "Close"]
     tiny = pd.DataFrame({"Open": [1.0], "High": [2.0], "Low": [0.5], "Close": [1.5]})
     tiny_out = analyzer.identify_candlestick_patterns(tiny.copy())
-    assert list(tiny_out.columns) == ["Open", "High", "Low", "Close"]
+    # KNOWN_ISSUES B1 (fixed): Pattern/Code are now always added (NaN when
+    # nothing matches); was ["Open", "High", "Low", "Close"].
+    assert list(tiny_out.columns) == ["Open", "High", "Low", "Close", "Pattern", "Code"]
+    assert tiny_out[["Pattern", "Code"]].isna().all().all()
 
 
 # --------------------------------------------------------------------------- #

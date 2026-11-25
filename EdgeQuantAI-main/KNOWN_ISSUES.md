@@ -54,7 +54,10 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 
 ## B. Multi-ticker pipeline (`get_latest_candlestick_patterns` / `main`)
 
-### B1 🔴 `KeyError` when no ticker has any candlestick match
+### B1 🔴 `KeyError` when no ticker has any candlestick match — ✅ Fixed
+- **Status:** fixed in commit `fix(patterns): always add Pattern/Code columns (B1)`.
+  `identify_candlestick_patterns` now always returns `Pattern` (object, NaN) and
+  `Code` (float64, NaN) columns, so the merge can't fail.
 - **Original:** `EdgeQuantAI.py:540-545` · **Now:** `analyzer.py:279`
 - **Problem:** `Pattern`/`Code` only exist if some pattern matched somewhere in the
   history. If none did, `final_result_df[["Date", "Pattern", "Code", "Ticker"]]`
