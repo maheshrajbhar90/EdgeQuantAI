@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- `main.py` adds `src/` to `sys.path` only when `stock_technical_analyzer` isn't
+  importable (new `app_bootstrap.py`), so an installed package is never loaded
+  twice.
+
 ## [0.1.0] - 2026-11-25
 
 A behaviour-preserving refactor: for the same inputs, every public method returns
