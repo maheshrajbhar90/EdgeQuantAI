@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from the balance-sheet rows. It used to look them up as columns, always got 0
   and fell back to `info["totalDebt"]`. This changes `total_debt` and `roce`
   (KNOWN_ISSUES F1).
+- Short-term debt is also read from the `Current Debt` row, the label current
+  yfinance uses; `Short Term Debt` is still checked first. Without this, F1
+  counted only long-term debt on live data (KNOWN_ISSUES F2a).
 
 ### Changed
 - `main.py` adds `src/` to `sys.path` only when `stock_technical_analyzer` isn't

@@ -166,18 +166,27 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
   to `info["totalDebt"]`. Pinned by `fundamental_compute_ratios.json`.
 - **Suggested fix:** use `_cell(balance, LONG_TERM_DEBT, bc) or 0`.
 
-### F2 🔴 Statement row labels likely don't match current yfinance
-- **Now:** `fundamental.py:28-37`
+### F2a 🔴 Short-term debt label (`Current Debt`) — ✅ Fixed
+- **Status:** fixed in commit `fix(fundamental): read "Current Debt" as short-term debt (F2a)`.
+  Split out of F2 because the F1 fix alone made live `total_debt` long-term-only.
+  Short-term debt is now read from the first present label in
+  `("Short Term Debt", "Current Debt")`.
+- **Live check (RELIANCE.NS, Nov 2026):** `total_debt` = 2707.5 bn (`Long Term Debt`)
+  \+ 1036.7 bn (`Current Debt`) = 3744.2 bn. The balance sheet's own `Total Debt`
+  row is 3980.0 bn; the difference is lease obligations, which are not counted.
+  The old `info["totalDebt"]` value was 5020.5 bn.
+
+### F2 🔴 Remaining statement row labels don't match current yfinance (open)
+- **Now:** `fundamental.py` (row-label constants)
 - **Problem:** `"Total Stockholder Equity"`, `"Total Cash From Operating Activities"`
-  and `"Capital Expenditures"` are older yfinance labels. Current versions appear to
-  use names like `"Stockholders Equity"`, `"Operating Cash Flow"` and
-  `"Capital Expenditure"`. If so, `total_equity`, `operating_cf`, `fcf`, `roe` and
-  `roce` are always `None`. Check against live `Ticker(...).balance_sheet.index`.
-  *Checked on RELIANCE.NS (Nov 2026):* `Total Stockholder Equity` and
-  `Short Term Debt` are absent; the real rows are `Stockholders Equity` and
-  `Current Debt` (`Long Term Debt` and `Total Debt` exist). After the F1 fix, debt
-  therefore picks up long-term debt only, until this label issue is fixed.
-- **Suggested fix:** try a list of candidate labels per item.
+  and `"Capital Expenditures"` are older yfinance labels. *Checked on RELIANCE.NS
+  (Nov 2026):* `Total Stockholder Equity` is absent; the real row is
+  `Stockholders Equity`. As a result `total_equity`, `roe` and `roce` are `None` on
+  live data. The cash-flow labels (`operating_cf`, `fcf`) still need the same live
+  check. The debt part of this issue is fixed as F2a.
+- **Suggested fix:** candidate labels per item, like F2a. **Fix together with F3:**
+  once the capex label resolves, `fcf` goes live with the wrong sign unless F3 is
+  fixed in the same change.
 
 ### F3 🟠 FCF sign
 - **Now:** `fundamental.py` (`fcf = operating_cf - capex`)

@@ -34,6 +34,9 @@ TOTAL_EQUITY: Final = "Total Stockholder Equity"
 TOTAL_ASSETS: Final = "Total Assets"
 LONG_TERM_DEBT: Final = "Long Term Debt"
 SHORT_TERM_DEBT: Final = "Short Term Debt"
+#: Short-term debt row labels, first match wins. Current yfinance uses
+#: "Current Debt"; "Short Term Debt" is the older label (KNOWN_ISSUES F2a).
+SHORT_TERM_DEBT_LABELS: Final = (SHORT_TERM_DEBT, "Current Debt")
 OPERATING_CASH_FLOW: Final = "Total Cash From Operating Activities"
 CAPEX: Final = "Capital Expenditures"
 
@@ -44,6 +47,11 @@ def _latest_col(df: pd.DataFrame) -> Any:
 
 def _cell(df: pd.DataFrame, row: str, col: Any) -> Any:
     return df.loc[row, col] if row in df.index else None
+
+
+def _first_cell(df: pd.DataFrame, rows: tuple[str, ...], col: Any) -> Any:
+    """Value of the first label in ``rows`` present in ``df.index``, else ``None``."""
+    return next((_cell(df, r, col) for r in rows if r in df.index), None)
 
 
 class FundamentalAnalyser:
@@ -156,10 +164,11 @@ class FundamentalAnalyser:
         total_equity = _cell(balance, TOTAL_EQUITY, bc)
         total_assets = _cell(balance, TOTAL_ASSETS, bc)
         # Line items are rows (KNOWN_ISSUES F1). A missing row counts as 0, and a
-        # total of 0 falls back to info["totalDebt"], as before.
-        total_debt = (
-            (_cell(balance, LONG_TERM_DEBT, bc) or 0) + (_cell(balance, SHORT_TERM_DEBT, bc) or 0)
-        ) or info.get("totalDebt")
+        # total of 0 falls back to info["totalDebt"], as before. Short-term debt
+        # is "Current Debt" in current yfinance (KNOWN_ISSUES F2a).
+        long_term = _cell(balance, LONG_TERM_DEBT, bc) or 0
+        short_term = _first_cell(balance, SHORT_TERM_DEBT_LABELS, bc) or 0
+        total_debt = (long_term + short_term) or info.get("totalDebt")
         operating_cf = _cell(cash, OPERATING_CASH_FLOW, cc)
         capex = _cell(cash, CAPEX, cc)
 

@@ -162,8 +162,10 @@ _REAL_LAYOUT_ROWS = {
 def test_f1_long_term_debt_read_from_rows() -> None:
     fin = {"balance": _balance_sheet(_REAL_LAYOUT_ROWS), "info": {"totalDebt": 9.99e12}}
     metrics = sta.FundamentalAnalyser().compute_ratios(fin)
-    # Latest column's "Long Term Debt" row, not the info["totalDebt"] fallback.
-    assert metrics["total_debt"] == 2.8e12
+    # Rows of the latest column, not the info["totalDebt"] fallback.
+    # KNOWN_ISSUES F2a: was 2.8e12 (Long Term Debt only) before "Current Debt"
+    # was read as the short-term component.
+    assert metrics["total_debt"] == 2.8e12 + 7.0e11
 
 
 def test_f1_long_and_short_term_debt_are_summed() -> None:
@@ -232,3 +234,32 @@ def test_c1_other_warnings_still_surface() -> None:
 
     with pytest.warns(UserWarning, match="still visible"):
         warnings.warn("still visible", UserWarning, stacklevel=1)
+
+
+# --------------------------------------------------------------------------- #
+# F2a: short-term debt label. Live yfinance names it "Current Debt"; the code
+# only knew "Short Term Debt", so on live data total_debt was long-term only.
+# --------------------------------------------------------------------------- #
+def test_f2a_current_debt_counts_as_short_term() -> None:
+    rows = {"Long Term Debt": [400.0, 0.0, 0.0, 0.0], "Current Debt": [150.0, 0.0, 0.0, 0.0]}
+    fin = {"balance": _balance_sheet(rows), "info": {"totalDebt": 999.0}}
+    assert sta.FundamentalAnalyser().compute_ratios(fin)["total_debt"] == 550.0
+
+
+def test_f2a_short_term_debt_label_still_preferred() -> None:
+    rows = {
+        "Long Term Debt": [400.0, 0.0, 0.0, 0.0],
+        "Short Term Debt": [100.0, 0.0, 0.0, 0.0],
+        "Current Debt": [150.0, 0.0, 0.0, 0.0],
+    }
+    fin = {"balance": _balance_sheet(rows), "info": {"totalDebt": 999.0}}
+    # Not double-counted: the first available short-term label wins.
+    assert sta.FundamentalAnalyser().compute_ratios(fin)["total_debt"] == 500.0
+
+
+def test_f2a_only_current_debt_still_beats_fallback() -> None:
+    fin = {
+        "balance": _balance_sheet({"Current Debt": [80.0, 0.0, 0.0, 0.0]}),
+        "info": {"totalDebt": 1.0},
+    }
+    assert sta.FundamentalAnalyser().compute_ratios(fin)["total_debt"] == 80.0
