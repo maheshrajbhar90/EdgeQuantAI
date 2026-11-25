@@ -1,0 +1,215 @@
+{
+ "kind": "frame",
+ "shape": [
+  2,
+  32
+ ],
+ "columns": [
+  "Date",
+  "Ticker",
+  "Close",
+  "Change%",
+  "Volume",
+  "VMA20",
+  "RSI_Value",
+  "RSI>=60",
+  "MACD_Value",
+  "Signal_Value",
+  "MACD_Crossover",
+  "Volume_Spike",
+  "Z_score",
+  "BB_Direction",
+  "Stoch_Direction",
+  "ATR_Direction",
+  "ADX_Direction",
+  "EMA5",
+  "EMA9",
+  "EMA26",
+  "SMA50",
+  "SMA200",
+  "EMA_Crossover",
+  "Pivot_point",
+  "Resistance_1",
+  "Resistance_2",
+  "Resistance_3",
+  "Support_1",
+  "Support_2",
+  "Support_3",
+  "Pattern",
+  "Code"
+ ],
+ "dtypes": [
+  "datetime64[<unit>]",
+  "<string-like>",
+  "float64",
+  "float64",
+  "int64",
+  "float64",
+  "float64",
+  "bool",
+  "float64",
+  "float64",
+  "<string-like>",
+  "bool",
+  "float64",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "<string-like>",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "<string-like>",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "float64",
+  "<string-like>",
+  "float64"
+ ],
+ "index_name": null,
+ "index_dtype": "int64",
+ "index": [
+  0,
+  1
+ ],
+ "data": {
+  "Date": [
+   {
+    "timestamp": "2024-03-22T05:30:00"
+   },
+   {
+    "timestamp": "2023-12-15T05:30:00"
+   }
+  ],
+  "Ticker": [
+   "AAA",
+   "BBB"
+  ],
+  "Close": [
+   1564.22,
+   1404.93
+  ],
+  "Change%": [
+   -0.006390222832024728,
+   0.03395668204799862
+  ],
+  "Volume": [
+   4000000,
+   1060089
+  ],
+  "VMA20": [
+   1304403.1,
+   1116342.0
+  ],
+  "RSI_Value": [
+   50.410342468863966,
+   66.09107588619679
+  ],
+  "RSI>=60": [
+   false,
+   true
+  ],
+  "MACD_Value": [
+   13.821008887384778,
+   28.363771767602884
+  ],
+  "Signal_Value": [
+   18.79972798488097,
+   27.62898995015805
+  ],
+  "MACD_Crossover": [
+   "",
+   "Bullish"
+  ],
+  "Volume_Spike": [
+   true,
+   false
+  ],
+  "Z_score": [
+   4.001630103842224,
+   -0.3429907425470658
+  ],
+  "BB_Direction": [
+   "Bearish",
+   "Bullish"
+  ],
+  "Stoch_Direction": [
+   "Bullish",
+   "Overbought Bullish"
+  ],
+  "ATR_Direction": [
+   "Decreasing",
+   "Increasing"
+  ],
+  "ADX_Direction": [
+   "Weak Trend",
+   "Weak Trend"
+  ],
+  "EMA5": [
+   1573.5057936456692,
+   1363.6029752970608
+  ],
+  "EMA9": [
+   1577.6937189572213,
+   1352.92777560475
+  ],
+  "EMA26": [
+   1563.1781606115783,
+   1318.1514645950747
+  ],
+  "SMA50": [
+   1533.1847999999995,
+   1260.5476000000006
+  ],
+  "SMA200": [
+   1316.2708999999998,
+   1166.0666499999998
+  ],
+  "EMA_Crossover": [
+   "",
+   ""
+  ],
+  "Pivot_point": [
+   1568.48,
+   1407.97
+  ],
+  "Resistance_1": [
+   1581.32,
+   1412.87
+  ],
+  "Resistance_2": [
+   1598.43,
+   1420.8
+  ],
+  "Resistance_3": [
+   1611.27,
+   1425.7
+  ],
+  "Support_1": [
+   1551.37,
+   1400.04
+  ],
+  "Support_2": [
+   1538.53,
+   1395.14
+  ],
+  "Support_3": [
+   1521.42,
+   1387.21
+  ],
+  "Pattern": [
+   "long_line",
+   "NaN"
+  ],
+  "Code": [
+   -100.0,
+   "NaN"
+  ]
+ }
+}
