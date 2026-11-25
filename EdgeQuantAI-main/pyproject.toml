@@ -1,4 +1,5 @@
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = [".", "tests"]
+testpaths = ["tests", "src"]
+pythonpath = ["src", "tests"]
+addopts = ["--doctest-modules", "--strict-markers", "-ra"]
 norecursedirs = ["tests/legacy", "tests/fixtures"]
