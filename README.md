@@ -76,7 +76,7 @@ Requires Python **3.10+**.
 
 ```bash
 git clone https://github.com/maheshrajbhar90/EdgeQuantAI.git
-cd EdgeQuantAI/EdgeQuantAI-main
+cd EdgeQuantAI
 pip install -e .            # library only
 pip install -e ".[dev]"     # + pytest, ruff, mypy, pre-commit
 ```
@@ -239,7 +239,7 @@ it to `meta-llama/Llama-3.1-8B-Instruct` via the Hugging Face Inference API.
 
 ```bash
 pip install -e ".[dev]"
-pre-commit install            # run from the repository root
+pre-commit install
 
 pytest --cov                  # tests + coverage (offline, ~3 s)
 ruff check . && ruff format --check .
@@ -265,7 +265,6 @@ If you intentionally change behaviour, regenerate snapshots with
 - Fix the items in [KNOWN_ISSUES.md](KNOWN_ISSUES.md), each in its own
   behaviour-changing PR (ticker suffix handling, IST date shift and the global
   warnings filter first).
-- Move the project to the repository root.
 - Add a ticker-comparison mode (the Streamlit app already detects multiple
   symbols).
 - Make indicator parameters configurable per instance.

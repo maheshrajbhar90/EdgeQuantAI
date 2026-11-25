@@ -1,13 +1,11 @@
-# Install once with:  pip install -e "EdgeQuantAI-main[dev]" && pre-commit install
+# Install once with:  pip install -e ".[dev]" && pre-commit install
 # Run on everything:  pre-commit run --all-files
-#
-# The Python project lives in EdgeQuantAI-main/ (pre-commit must sit at the git root).
 #
 # Excluded from all hooks:
 #   * tests/golden/ and tests/legacy/ are byte-exact fixtures (snapshots of the
 #     original behaviour and a frozen copy of the original code);
 #   * assets/ and config.json are runtime data used by the Streamlit app.
-exclude: ^EdgeQuantAI-main/(tests/(golden|legacy)/|assets/|config\.json$)
+exclude: ^(tests/(golden|legacy)/|assets/|config\.json$)
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -34,7 +32,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: bash -c 'cd EdgeQuantAI-main && mypy'
+        entry: mypy
         language: system
         types: [python]
         pass_filenames: false

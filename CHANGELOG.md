@@ -69,6 +69,10 @@ and a strict `divergence(...)` marker or an updated expectation.
   counted only long-term debt on live data (KNOWN_ISSUES F2a).
 
 ### Changed
+- The project moved from its sub-folder to the repository root
+  (`git mv`, history preserved). Run commands, `pip install -e .` and
+  `streamlit run main.py` from the root. Streamlit Cloud's main file path is now
+  `main.py` (KNOWN_ISSUES G5).
 - `main.py` adds `src/` to `sys.path` only when `stock_technical_analyzer` isn't
   importable (new `app_bootstrap.py`), so an installed package is never loaded
   twice.

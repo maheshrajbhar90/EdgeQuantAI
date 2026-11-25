@@ -48,7 +48,7 @@ dev = [
 [project.urls]
 Homepage = "https://github.com/maheshrajbhar90/EdgeQuantAI"
 Issues = "https://github.com/maheshrajbhar90/EdgeQuantAI/issues"
-Changelog = "https://github.com/maheshrajbhar90/EdgeQuantAI/blob/main/EdgeQuantAI-main/CHANGELOG.md"
+Changelog = "https://github.com/maheshrajbhar90/EdgeQuantAI/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

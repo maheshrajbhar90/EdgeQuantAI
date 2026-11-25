@@ -17,11 +17,6 @@ env:
   TA_LIB_VERSION: "0.8.3"
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
 
-defaults:
-  run:
-    # The Python project lives in a sub-directory of the repository.
-    working-directory: EdgeQuantAI-main
-
 jobs:
   lint:
     name: Lint (ruff)
@@ -60,7 +55,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: EdgeQuantAI-main/pyproject.toml
+          cache-dependency-path: pyproject.toml
 
       # TA-Lib wheels on PyPI bundle the C library, but install it anyway so a
       # source build (no wheel for this platform/Python) also succeeds.
@@ -115,5 +110,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: coverage-${{ matrix.python-version }}${{ matrix.pandas && format('-pandas{0}', matrix.pandas) || '' }}
-          path: EdgeQuantAI-main/coverage.xml
+          path: coverage.xml
           if-no-files-found: ignore

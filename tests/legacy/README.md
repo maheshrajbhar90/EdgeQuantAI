@@ -10,4 +10,6 @@ types) for the same inputs. Do not edit or lint these files.
 
 Verify provenance with:
 
-    git show a1feaa5:EdgeQuantAI-main/EdgeQuantAI/EdgeQuantAI.py | diff - tests/legacy/EdgeQuantAI.py
+    # The original files sat in a sub-folder in that commit, so look the path up:
+    old=$(git ls-tree -r --name-only a1feaa5 | grep '/EdgeQuantAI/EdgeQuantAI.py$')
+    git show "a1feaa5:$old" | diff - tests/legacy/EdgeQuantAI.py
