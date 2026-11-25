@@ -204,7 +204,7 @@ def test_c1_import_leaves_warning_filters_unchanged(module: str) -> None:
     import sys
 
     out = subprocess.run(
-        [sys.executable, "-P", "-c", _FILTER_PROBE.format(module=module)],
+        [sys.executable, "-I", "-c", _FILTER_PROBE.format(module=module)],
         capture_output=True,
         text=True,
         check=True,
