@@ -281,8 +281,11 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 
 <a id="g5"></a>
 
-### G5 🟡 The Python project lives in an `EdgeQuantAI-main/` sub-folder
-- **Problem:** this looks like an extracted GitHub zip. CI and pre-commit need
+### G5 🟡 The Python project lived in a sub-folder — ✅ Fixed
+- **Status:** fixed in commit `chore: move project files to repository root`: everything
+  now lives at the repository root, moved with `git mv` so history is preserved.
+  **Action needed outside git:** set the Streamlit Cloud "main file path" to `main.py`.
+- **Problem (was):** the project sat in a sub-folder that looked like an extracted GitHub zip. CI and pre-commit need
   `working-directory`/`cd` workarounds, and `.devcontainer` `openFiles: README.md`
   points at a file that doesn't exist at the repo root.
 - **Suggested fix:** move the project to the repository root, then update the Streamlit
@@ -313,6 +316,6 @@ the original. All return values, dtypes, column orders and exceptions are unchan
    `Exception`. Every failure the original could realistically hit (bad operand types,
    zero division, network errors, invalid JSON) is still caught.
 5. **`EdgeQuantAI.__version__`** is now `"0.1.0"` (was `"0.0.0.1"`).
-6. **Running uninstalled:** `from EdgeQuantAI import ...` from the project folder now
+6. **Running uninstalled:** `from EdgeQuantAI import ...` from the repository root now
    needs `pip install -e .` (or `src/` on `sys.path`). `main.py` adds `src/` itself, so
    `streamlit run main.py` works without installing.

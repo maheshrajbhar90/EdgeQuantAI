@@ -7,10 +7,10 @@ features are all welcome.
 
 ```bash
 git clone https://github.com/maheshrajbhar90/EdgeQuantAI.git
-cd EdgeQuantAI/EdgeQuantAI-main
+cd EdgeQuantAI
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-cd .. && pre-commit install          # hooks are configured at the repository root
+pre-commit install
 ```
 
 If `pip install` fails on TA-Lib, see the TA-Lib section of the
@@ -18,7 +18,7 @@ If `pip install` fails on TA-Lib, see the TA-Lib section of the
 
 ## Checks (the same as CI)
 
-Run from `EdgeQuantAI-main/`:
+Run from the repository root:
 
 ```bash
 ruff check . && ruff format --check .
