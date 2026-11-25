@@ -1,0 +1,6 @@
+# Secrets: `streamlit run EdgeQuantAI-main/main.py` from the repository root
+# reads ./.streamlit/secrets.toml. See EdgeQuantAI-main/.gitignore for the rest.
+**/.streamlit/secrets.toml
+**/config.json
+.env
+.env.*

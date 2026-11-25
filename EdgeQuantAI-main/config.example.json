@@ -1,0 +1,5 @@
+{
+  "API_KEY": "<your-hugging-face-token>",
+  "OPENAI_API_KEY": "<optional-openai-api-key>",
+  "FMP_API_KEY": "<optional-financialmodelingprep-api-key>"
+}

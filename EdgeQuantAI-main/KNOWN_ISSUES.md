@@ -193,7 +193,10 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 
 ## G. Streamlit app and repository
 
-### G1 🔴 `main.py` crashes without `config.json`, even when Streamlit secrets are set
+### G1 🔴 `main.py` crashes without `config.json`, even when Streamlit secrets are set — ✅ Fixed
+- **Status:** fixed in commit `fix(app): load keys without config.json; stop tracking it (G1, G2)`.
+  The new `app_config.py` reads each key from `st.secrets`, then environment variables
+  (`HF_TOKEN`, `OPENAI_API_KEY`, `FMP_API_KEY`), then `config.json` only if the file exists.
 - **Now:** `main.py:38`
 - **Problem:** `config.json` is loaded unconditionally before the
   `st.secrets` → `config.json` fallback logic, so it raises `FileNotFoundError`
@@ -201,7 +204,12 @@ Severity: 🔴 wrong results or crashes · 🟠 surprising behaviour · 🟡 cos
 - **Suggested fix:** delete the unconditional load (lines 36-38) but keep `working_dir`,
   which `load_nse_symbols` uses. The fallback below already handles a missing file.
 
-### G2 🔴 `config.json` is tracked despite being in `.gitignore`
+### G2 🔴 `config.json` is tracked despite being in `.gitignore` — ✅ Fixed
+- **Status:** fixed in the same commit as G1. `config.json` is no longer tracked
+  (`git rm --cached`), `config.example.json` holds placeholders only, and both
+  `.gitignore` files cover `config.json` and `.streamlit/secrets.toml`.
+  **Untracking doesn't remove old versions from git history. Rotate any key that
+  was ever committed.**
 - **Problem:** the file is committed with an empty key. A developer who fills in a real
   key locally will see it as a modified file and could commit the secret.
 - **Suggested fix:** `git rm --cached config.json`, then commit `config.example.json`.
