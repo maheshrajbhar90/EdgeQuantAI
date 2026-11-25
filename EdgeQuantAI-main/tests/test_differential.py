@@ -28,6 +28,18 @@ from conftest import FakeYF, load_raw_ohlcv, to_yf_frame
 LEGACY_DIR = Path(__file__).parent / "legacy"
 
 
+def divergence(issue: str, why: str) -> pytest.MarkDecorator:
+    """Mark a case where the package *intentionally* differs from tests/legacy/.
+
+    ``strict=True`` makes the test fail if old and new ever agree again, so a
+    stale marker can't hide anything. The new behaviour itself is asserted in
+    tests/test_known_issue_fixes.py.
+    """
+    return pytest.mark.xfail(
+        strict=True, raises=AssertionError, reason=f"KNOWN_ISSUES {issue}: {why}"
+    )
+
+
 def _load(name: str, path: Path) -> ModuleType:
     spec = importlib.util.spec_from_file_location(name, path)
     assert spec is not None and spec.loader is not None
@@ -111,7 +123,19 @@ def run_both(old: Callable[[], Any], new: Callable[[], Any]) -> None:
 # --------------------------------------------------------------------------- #
 # StockTechnicalAnalyzer
 # --------------------------------------------------------------------------- #
-@pytest.mark.parametrize("ticker", ["AAA", "BBB", "ZZZ", "AAA.NS", "FLAT", "INTRA"])
+@pytest.mark.parametrize(
+    "ticker",
+    [
+        "AAA",
+        "BBB",
+        "ZZZ",
+        pytest.param(
+            "AAA.NS", marks=divergence("A1", "legacy requests AAA.NS.NS and returns None")
+        ),
+        "FLAT",
+        "INTRA",
+    ],
+)
 def test_fetch_ohlc(pair: tuple[Any, Any], fake_yf: FakeYF, ticker: str) -> None:
     fake_yf.register("FLAT.NS", load_raw_ohlcv(5))
     intra = load_raw_ohlcv(5)

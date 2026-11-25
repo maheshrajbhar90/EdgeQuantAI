@@ -90,8 +90,9 @@ def test_fetch_ohlc_unknown_ticker_returns_none(
 def test_fetch_ohlc_appends_suffix_even_if_present(
     analyzer: StockTechnicalAnalyzer, fake_yf: FakeYF
 ) -> None:
-    assert analyzer.fetch_ohlc("AAA.NS") is None
-    assert fake_yf.calls[-1][0] == ("AAA.NS.NS",)
+    # KNOWN_ISSUES A1 (fixed): was `is None` after requesting "AAA.NS.NS".
+    assert analyzer.fetch_ohlc("AAA.NS") is not None
+    assert fake_yf.calls[-1][0] == ("AAA.NS",)
 
 
 def test_fetch_ohlc_intraday_datetime_column(

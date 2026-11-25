@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Tickers that already end with `.NS`/`.BO` (any case) no longer get the
+  exchange suffix appended again (`"TCS.NS"` used to request `TCS.NS.NS`), in
+  `fetch_ohlc`, the multi-ticker pipeline and `FundamentalAnalyser` (KNOWN_ISSUES A1).
+
 ### Changed
 - `main.py` adds `src/` to `sys.path` only when `stock_technical_analyzer` isn't
   importable (new `app_bootstrap.py`), so an installed package is never loaded

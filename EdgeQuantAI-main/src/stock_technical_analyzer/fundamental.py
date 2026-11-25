@@ -16,6 +16,7 @@ from openai import OpenAI
 from tabulate import tabulate
 
 from stock_technical_analyzer.constants import DEFAULT_EXCHANGE_SUFFIX
+from stock_technical_analyzer.data import to_yahoo_symbol
 
 logger = logging.getLogger(__name__)
 
@@ -94,12 +95,13 @@ class FundamentalAnalyser:
         """Fetch annual statements and ``info`` from yfinance.
 
         Args:
-            symbol: Base symbol; :attr:`exchange_suffix` is appended.
+            symbol: Base symbol; :attr:`exchange_suffix` is appended unless the
+                symbol is already qualified (``.NS``/``.BO``).
 
         Returns:
             Dict with ``income``, ``balance``, ``cashflow``, ``info``, ``earnings``.
         """
-        tk = yf.Ticker(symbol + self.exchange_suffix)
+        tk = yf.Ticker(to_yahoo_symbol(symbol, self.exchange_suffix))
         return {
             "income": tk.financials,
             "balance": tk.balance_sheet,
