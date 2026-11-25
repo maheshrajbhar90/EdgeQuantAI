@@ -64,11 +64,25 @@ jobs:
 
       # TA-Lib wheels on PyPI bundle the C library, but install it anyway so a
       # source build (no wheel for this platform/Python) also succeeds.
-      - name: Install TA-Lib C library
+      # TA_LIB_VERSION is an upstream release tag (github.com/ta-lib/ta-lib) and
+      # must stay compatible with the TA-Lib wrapper range in pyproject.toml.
+      # The release ships a prebuilt .deb, so the download is what gets cached.
+      - name: Cache TA-Lib C library package
+        id: ta-lib-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ta-lib
+          key: ta-lib-deb-${{ env.TA_LIB_VERSION }}-amd64
+
+      - name: Download TA-Lib C library
+        if: steps.ta-lib-cache.outputs.cache-hit != 'true'
         run: |
-          curl -fsSL -o /tmp/ta-lib.deb \
+          mkdir -p ~/.cache/ta-lib
+          curl -fsSL -o ~/.cache/ta-lib/ta-lib.deb \
             "https://github.com/ta-lib/ta-lib/releases/download/v${TA_LIB_VERSION}/ta-lib_${TA_LIB_VERSION}_amd64.deb"
-          sudo dpkg -i /tmp/ta-lib.deb
+
+      - name: Install TA-Lib C library
+        run: sudo dpkg -i ~/.cache/ta-lib/ta-lib.deb
 
       - name: Install package with dev extras
         run: pip install -e ".[dev]"
